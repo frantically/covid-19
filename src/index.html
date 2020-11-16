@@ -13,7 +13,7 @@
 
 <body>
 	<div class="topnav">
-		<a href="/">&nbsp;&nbsp;&nbsp;<i class="fas fa-viruses"></i> frantically | COVID-19</a>
+		<a href="/">&nbsp;&nbsp;&nbsp;<i class="fas fa-viruses"></i> frantically | COVID-19 | Switzerland</a>
 		<div class="topnav-right dataUpdate">
 			Latest Data: <span id="maxDate"><span>
 		</div>
@@ -37,34 +37,35 @@
 				<div id="last7Deaths"></div>
 			</div>
 		</div>
-		<h1>Cases per 100'000 (7 day average)</h1>
+		
 		<div class="row">
-			<div class="col-md-12 chart">
-				<canvas id="casesPer100000"></canvas>
+			<div class="col-lg-6">
+				<h1>Cases per 100'000 (7 day avg)</h1>
+				<div class="chart">
+					<canvas id="casesPer100000"></canvas>
+				</div>
+			</div>
+			<div class="col-lg-6">
+				<h1>Deaths</h1>
+				<div class="chart">
+					<canvas id="deaths"></canvas>
+				</div>
 			</div>
 		</div>
-
-		<h1>Deaths</h1>
 		<div class="row">
-			<div class="col-md-12 chart">
-				<canvas id="deaths"></canvas>
+			<div class="col-lg-6">
+				<h1>Cases</h1>
+				<div class="chart">
+					<canvas id="cases"></canvas>
+				</div>
+			</div>
+			<div class="col-lg-6">
+				<h1>Hospitalization</h1>
+				<div class="chart">
+					<canvas id="hospitalized"></canvas>
+				</div>
 			</div>
 		</div>
-
-		<h1>Cases (7 day average)</h1>
-		<div class="row">
-			<div class="col-md-12 chart">
-				<canvas id="cases"></canvas>
-			</div>
-		</div>
-
-		<h1>Hospitalization (Switzerland)</h1>
-		<div class="row">
-			<div class="col-md-12 chart">
-				<canvas id="hospitalized"></canvas>
-			</div>
-		</div>
-
 	</div>
 	<script src="index.js"></script>
 </body>

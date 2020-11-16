@@ -1,10 +1,3 @@
-// TODO
-// Canton selector?
-// hospitalization - how to show cantons?
-// hospitalization - colors
-// all cases
-// tear drop
-
 const PROMINENT_SERIES_ALPHA = 1
 const DEFAULT_SERIES_ALPHA = 0.5
 
@@ -35,6 +28,7 @@ function createCHData(data) {
         dateResult.samples++
         return result
     }, {})
+    //return Object.values(result) //need a way to project forward on most recent data - look for max and add in?
     return Object.values(result).filter(sample => sample.samples > 23)
 }
 
@@ -168,8 +162,8 @@ function addCases(data) {
         type: 'line',
         data: {
             datasets: [ 
-                chartSeries(getMovingAverage(createSeriesData(data, 'conf', 'ZH'), 7), "ZH", cantonConfig.ZH.color, PROMINENT_SERIES_ALPHA),
-                chartSeries(getMovingAverage(createSeriesData(data, 'conf', 'CH'), 7), "CH", cantonConfig.CH.color, PROMINENT_SERIES_ALPHA),
+                chartSeries(createSeriesData(data, 'ncumul_conf', 'ZH'), "ZH", cantonConfig.ZH.color, PROMINENT_SERIES_ALPHA),
+                chartSeries(createSeriesData(data, 'ncumul_conf', 'CH'), "CH", cantonConfig.CH.color, PROMINENT_SERIES_ALPHA),
             ]
         },
         options: chartOptions()
@@ -223,9 +217,9 @@ function addHospital(data) {
         type: 'line',
         data: {
             datasets: [
-                chartSeries(createSeriesData(data, 'current_hosp', 'ZH'), 'Hospitalized', [0, 0, 0], PROMINENT_SERIES_ALPHA), 
-                chartSeries(createSeriesData(data, 'current_vent', 'ZH'), 'Ventilated', [55, 55, 55], PROMINENT_SERIES_ALPHA),
-                chartSeries(createSeriesData(data, 'current_icu', 'ZH'), 'ICT', [110, 110, 110], PROMINENT_SERIES_ALPHA)
+                chartSeries(createSeriesData(data, 'current_hosp', 'ZH'), 'Hospitalized', [252, 191, 73], PROMINENT_SERIES_ALPHA), 
+                chartSeries(createSeriesData(data, 'current_vent', 'ZH'), 'Ventilated', [247, 127, 0], PROMINENT_SERIES_ALPHA),
+                chartSeries(createSeriesData(data, 'current_icu', 'ZH'), 'ICU', [214, 40, 40], PROMINENT_SERIES_ALPHA)
             ]
         },
         options: chartOptions()
