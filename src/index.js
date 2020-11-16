@@ -152,21 +152,14 @@ function addNumericalStats(data) {
     var lastWeekDeaths = deceased.slice(-7).map(e => e.y).reduce((a, c) => a+c, 0)
     var priorWeekDeaths = deceased.slice(-14).map(e => e.y).reduce((a, c) => a+c, 0) - lastWeekDeaths
 
-    var maxDate = data.filter(sample => sample.abbreviation_canton_and_fl == "CH").reduce((result, current) => {
-        return Math.max(result, current.date)
-    }, 0)
-
-    var maxZurichDate = data.filter(sample => (sample.abbreviation_canton_and_fl == "ZH" && sample.ncumul_conf)).reduce((result, current) => {
-        return Math.max(result, current.date)
-    }, 0)
+    var maxDate = data.reduce((result, current) => Math.max(result, current.date), 0)
 
     document.getElementById("totalConfirmed").innerHTML = formatNumber(ncumul_conf[ncumul_conf.length-1].y);
     document.getElementById("last7Days").innerHTML = `<span class="${lastWeek > priorWeek ? "down" : "up"}">${formatNumber(lastWeek)}</span>`
     document.getElementById("totalDeaths").innerHTML = formatNumber(ncumul_deceased[ncumul_deceased.length-1].y)
     document.getElementById("last7Deaths").innerHTML = `<span class="${lastWeekDeaths > priorWeekDeaths ? "down" : "up"}">${formatNumber(lastWeekDeaths)}</span>`
     document.getElementById("maxDate").innerHTML = `${new Date(maxDate).toLocaleDateString("de-CH")}`
-    document.getElementById("maxDateZH").innerHTML = `${new Date(maxZurichDate).toLocaleDateString("de-CH")}`
-}
+    }
 
 function addCases(data) {
     var ctx = document.getElementById('cases');

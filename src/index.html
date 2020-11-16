@@ -14,23 +14,18 @@
 <body>
 	<div class="topnav">
 		<a href="/">&nbsp;&nbsp;&nbsp;<i class="fas fa-viruses"></i> frantically | COVID-19</a>
-		<div class="topnav-right data">
+		<div class="topnav-right dataUpdate">
+			Latest Data: <span id="maxDate"><span>
 		</div>
 	</div>
 	<div class="container">
-
-		<div class="row dataUpdate">
-			<div class="col-sm-12 dataUpdate">
-				Data Updated: CH:<span id="maxDate"></span> ZH:<span id="maxDateZH"></span>
-			</div>
-		</div>
 		<div class="row highlights">
 			<div class="highlight">
-				<div class="highlightLabel">Total Cases (CH)</div>
+				<div class="highlightLabel">Total Cases</div>
 				<div id="totalConfirmed"></div>
 			</div>
 			<div class="highlight">
-				<div class="highlightLabel">Total Deaths (CH)</div>
+				<div class="highlightLabel">Total Deaths</div>
 				<div id="totalDeaths"></div>
 			</div>
 			<div class="highlight">
@@ -38,12 +33,11 @@
 				<div id="last7Days"></div>
 			</div>
 			<div class="highlight">
-				<div class="highlightLabel">Deaths Last Week (CH)</div>
+				<div class="highlightLabel">Deaths Last Week</div>
 				<div id="last7Deaths"></div>
 			</div>
-			
 		</div>
-		<h1>Confirmed Cases per 100'000 (7 day average)</h1>
+		<h1>Cases per 100'000 (7 day average)</h1>
 		<div class="row">
 			<div class="col-md-12 chart">
 				<canvas id="casesPer100000"></canvas>
@@ -57,7 +51,7 @@
 			</div>
 		</div>
 
-		<h1>Confirmed Cases (7 day average)</h1>
+		<h1>Cases (7 day average)</h1>
 		<div class="row">
 			<div class="col-md-12 chart">
 				<canvas id="cases"></canvas>
