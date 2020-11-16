@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<link rel="icon" href="logo.svg">
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.bundle.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<link rel="stylesheet" href="app.css">
+	<title>frantically | COVID-19</title>
+</head>
+
+<body>
+	<div class="topnav">
+		<a href="/">&nbsp;&nbsp;&nbsp;<i class="fas fa-viruses"></i> frantically | COVID-19</a>
+		<div class="topnav-right data">
+		</div>
+	</div>
+	<div class="container">
+
+		<div class="row dataUpdate">
+			<div class="col-sm-12 dataUpdate">
+				Data Updated: CH:<span id="maxDate"></span> ZH:<span id="maxDateZH"></span>
+			</div>
+		</div>
+		<div class="row highlights">
+			<div class="highlight">
+				<div class="highlightLabel">Total Cases (CH)</div>
+				<div id="totalConfirmed"></div>
+			</div>
+			<div class="highlight">
+				<div class="highlightLabel">Total Deaths (CH)</div>
+				<div id="totalDeaths"></div>
+			</div>
+			<div class="highlight">
+				<div class="highlightLabel">Cases Last Week</div>
+				<div id="last7Days"></div>
+			</div>
+			<div class="highlight">
+				<div class="highlightLabel">Deaths Last Week (CH)</div>
+				<div id="last7Deaths"></div>
+			</div>
+			
+		</div>
+		<h1>Confirmed Cases per 100'000 (7 day average)</h1>
+		<div class="row">
+			<div class="col-md-12 chart">
+				<canvas id="casesPer100000"></canvas>
+			</div>
+		</div>
+
+		<h1>Deaths</h1>
+		<div class="row">
+			<div class="col-md-12 chart">
+				<canvas id="deaths"></canvas>
+			</div>
+		</div>
+
+		<h1>Confirmed Cases (7 day average)</h1>
+		<div class="row">
+			<div class="col-md-12 chart">
+				<canvas id="cases"></canvas>
+			</div>
+		</div>
+
+		<h1>Hospitalization (Switzerland)</h1>
+		<div class="row">
+			<div class="col-md-12 chart">
+				<canvas id="hospitalized"></canvas>
+			</div>
+		</div>
+
+	</div>
+	<script src="index.js"></script>
+</body>
+
+</html>
