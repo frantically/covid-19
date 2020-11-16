@@ -218,8 +218,8 @@ function addHospital(data) {
         data: {
             datasets: [
                 chartSeries(createSeriesData(data, 'current_hosp', 'ZH'), 'Hospitalized', [252, 191, 73], PROMINENT_SERIES_ALPHA), 
-                chartSeries(createSeriesData(data, 'current_vent', 'ZH'), 'Ventilated', [247, 127, 0], PROMINENT_SERIES_ALPHA),
-                chartSeries(createSeriesData(data, 'current_icu', 'ZH'), 'ICU', [214, 40, 40], PROMINENT_SERIES_ALPHA)
+                chartSeries(createSeriesData(data, 'current_icu', 'ZH'), 'ICU', [247, 127, 0], PROMINENT_SERIES_ALPHA),
+                chartSeries(createSeriesData(data, 'current_vent', 'ZH'), 'Ventilated', [214, 40, 40], PROMINENT_SERIES_ALPHA),
             ]
         },
         options: chartOptions()
