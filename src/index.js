@@ -3,6 +3,7 @@ const DEFAULT_SERIES_ALPHA = 0.5
 
 const SAMPLE_DATA_FIELDS_SOURCE = ["ncumul_tested" , "ncumul_conf" , "new_hosp" , "current_hosp", "current_icu" , "current_vent" , "ncumul_released" , "ncumul_deceased", "current_isolated", "current_quarantined" , "current_quarantined_riskareatravel", "current_quarantined_total" ]
 const SAMPLE_DATA_FIELDS_ALL = SAMPLE_DATA_FIELDS_SOURCE.concat(["conf", "deceased"])
+
 var cantonConfig = {}
 
 function formatNumber(n) {
@@ -72,14 +73,20 @@ function chartOptions() {
                 type: 'time',
                 time: {
                     unit: 'month'
+                },
+                gridLines: {
+                    color: 'rgba(255rgba(0, 0, 0, 0.1)'
                 }
+
             }],
             yAxes: [{
                 type: 'linear',
                 ticks: {
                     maxTicksLimit: 5
+                },
+                gridLines: {
+                    color: 'rgba(255rgba(0, 0, 0, 0.1)'
                 }
-                
             }]
         },
         legend: {
@@ -228,10 +235,15 @@ function addHospital(data) {
 
 //TODO: could do two fetches in parallel
 function init() {
+
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        console.log('dark mode')
+        var element = document.body;
+        element.classList.remove("light");
+        element.classList.add("dark");
     } else {
-        console.log('light mode')
+        var element = document.body;
+        element.classList.add("light");
+        element.classList.remove("dark");
     }
     fetch('cantonConfig.json')
         .then(r =>   r.json())
