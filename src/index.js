@@ -10,6 +10,60 @@ function formatNumber(n) {
     return new Number(n).toLocaleString('de-CH')
 }
 
+function formatDate(d) {
+    return `${new Date(d).toLocaleDateString("de-CH")}`
+}
+
+function projectIncompleteData(data) {
+    var maxDate = data.reduce((a, c) => Math.max(a, c.date), Date.parse("2020-01-01"))
+    var cantons = data.reduce((a, c) => {
+        a.add(c.abbreviation_canton_and_fl)
+        return a
+    }, new Set())
+    
+    cantons = [...cantons]
+
+    var missingEndDateSamples = cantons
+        .map(canton => {
+            var cantonData = data.filter(sample => sample.abbreviation_canton_and_fl == canton)
+            return cantonData[cantonData.length - 1]
+        })
+        .filter(cantonMax => cantonMax.date < maxDate)
+        .map(cantonMax => {
+            return {abbreviation_canton_and_fl: cantonMax.abbreviation_canton_and_fl, date: maxDate}
+        })
+    data = data.concat(missingEndDateSamples)
+
+    var mostRecentSampleValuesByCanton = {}
+    cantons
+        .map(canton => data.filter(sample => sample.abbreviation_canton_and_fl == canton))
+        .map(cantonData => {
+            var result = {}
+            cantonData.forEach(sample => {
+                SAMPLE_DATA_FIELDS_ALL.forEach(field => {
+                    result[field] = isNaN(sample[field]) ? result[field] : sample[field]
+                })
+            })
+            result.abbreviation_canton_and_fl = cantonData[0].abbreviation_canton_and_fl
+            result.date = maxDate
+            return result
+        })
+        .forEach(carryForward => {mostRecentSampleValuesByCanton[carryForward.abbreviation_canton_and_fl] = carryForward})
+    
+    //now apply the carry forwards to the last sample for a canton
+    cantons
+        .map(canton => {
+            var cantonData = data.filter(sample => sample.abbreviation_canton_and_fl == canton)
+            return cantonData[cantonData.length - 1]
+        })
+        .forEach(cantonMax =>{
+            SAMPLE_DATA_FIELDS_ALL.forEach(field => {
+                cantonMax[field] = isNaN(cantonMax[field]) ? mostRecentSampleValuesByCanton[cantonMax.abbreviation_canton_and_fl][field] : cantonMax[field]
+            })
+        })
+    return data
+}
+
 function createCHData(data) {
     var result = data.reduce((result, sample) => {
         var dateResult = result[sample.date]
@@ -159,7 +213,7 @@ function addNumericalStats(data) {
     document.getElementById("last7Days").innerHTML = `<span class="${lastWeek > priorWeek ? "down" : "up"}">${formatNumber(lastWeek)}</span>`
     document.getElementById("totalDeaths").innerHTML = formatNumber(ncumul_deceased[ncumul_deceased.length-1].y)
     document.getElementById("last7Deaths").innerHTML = `<span class="${lastWeekDeaths > priorWeekDeaths ? "down" : "up"}">${formatNumber(lastWeekDeaths)}</span>`
-    document.getElementById("maxDate").innerHTML = `${new Date(maxDate).toLocaleDateString("de-CH")}`
+    document.getElementById("maxDate").innerHTML = `${formatDate(maxDate)}`
     }
 
 function addCases(data) {
@@ -184,8 +238,8 @@ function addDeaths(data) {
         type: 'line',
         data: {
             datasets: [ 
-                chartSeries(getMovingAverage(createSeriesData(data, 'deceased', 'ZH'), 7), "ZH", cantonConfig.ZH.color, PROMINENT_SERIES_ALPHA),
-                chartSeries(getMovingAverage(createSeriesData(data, 'deceased', 'CH'), 7), "CH", cantonConfig.CH.color, PROMINENT_SERIES_ALPHA),
+                chartSeries(createSeriesData(data, 'deceased', 'ZH'), "ZH", cantonConfig.ZH.color, PROMINENT_SERIES_ALPHA),
+                chartSeries(createSeriesData(data, 'deceased', 'CH'), "CH", cantonConfig.CH.color, PROMINENT_SERIES_ALPHA),
             ]
         },
         options: chartOptions()
@@ -198,9 +252,6 @@ function getCasesPer100k(data, canton) {
 }
 
 function addCasesPer100000(data) {
-
-    console.log(getMovingAverage(getCasesPer100k(data, "ZH"), 7))
-
     var ctx = document.getElementById('casesPer100000');
 
     new Chart(ctx, {
@@ -248,12 +299,13 @@ function init() {
     fetch('cantonConfig.json')
         .then(r =>   r.json())
         .then(r => cantonConfig = r)
-        //.then(x => { return fetch('data.csv')})
+        // .then(x => { return fetch('data.csv')})
         .then(x => { return fetch('https://raw.githubusercontent.com/openZH/covid_19/master/COVID19_Fallzahlen_CH_total_v2.csv')})
         .then(r => r.text())
         .then(data => {
             data = parseData(data)
             data = data.concat(createCHData(data))
+            data = projectIncompleteData(data)
             addNumericalStats(data)
             addCases(data)
             addCasesPer100000(data)
