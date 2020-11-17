@@ -238,8 +238,8 @@ function addDeaths(data) {
         type: 'line',
         data: {
             datasets: [ 
-                chartSeries(createSeriesData(data, 'deceased', 'ZH'), "ZH", cantonConfig.ZH.color, PROMINENT_SERIES_ALPHA),
-                chartSeries(createSeriesData(data, 'deceased', 'CH'), "CH", cantonConfig.CH.color, PROMINENT_SERIES_ALPHA),
+                chartSeries(getMovingAverage(createSeriesData(data, 'deceased', 'ZH'), 7), "ZH", cantonConfig.ZH.color, PROMINENT_SERIES_ALPHA),
+                chartSeries(getMovingAverage(createSeriesData(data, 'deceased', 'CH'), 7), "CH", cantonConfig.CH.color, PROMINENT_SERIES_ALPHA),
             ]
         },
         options: chartOptions()
