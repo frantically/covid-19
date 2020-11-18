@@ -79,3 +79,8 @@ h1 {
 .down {
   color: #ec524b;
 }
+
+.beta {
+  color: red;
+  font-weight: bold;
+}
