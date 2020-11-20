@@ -4,6 +4,7 @@
 // KEYS SAMPLE_DATA_ is there a better way to do this?
 // SPARK LINES FOR THE LAST 7 DAYS?
 // LATEST DATE ISN'T LOOKING AT COMPLETE DAYS ONLY
+// STRIP OUT THE EARLY DAYS WITH LITTLE DATA?
 
 const PROMINENT_SERIES_ALPHA = 1
 const DEFAULT_SERIES_ALPHA = 0.5
@@ -23,6 +24,7 @@ function scaffoldData(source) {
         a.max = Math.max(c.date, a.max)
         return a
     }, {min: Number.MAX_VALUE , max: 0})
+    console.log(`Date Range in data: ${formatDate(minMax.min)} - ${formatDate(minMax.max)}`)
     var days = []
     for(i = minMax.min;i<= minMax.max;i = i+ONE_DAY) {
         days.push(i)
@@ -56,11 +58,11 @@ function carryForwardAccumlatedValues(data) {
                 }
             })
         })
-        
+
         //but wipe out any extrapolation after the last value in the underlying data source
         SAMPLE_DATA_FIELDS_CARRY.forEach(field => {
             var i = cantonData.length - 1
-            while(isNaN(cantonData[i][`${field}_raw`])) {
+            while(isNaN(cantonData[i][`${field}_raw`]) && i > 0) {
                 cantonData[i][field] = NaN
                 i--
             }
@@ -177,9 +179,11 @@ function chartOptions() {
 
 function getMovingAverage(data, accumulativeField, days) {
     var result = []
-    for(i = days -1 ;i<data.length;i++) {
-        var point = {x: data[i].date, y: Math.round((data[i][accumulativeField]-data[i-days+1][accumulativeField])/days)}
-        result.push(point)
+    if(data) {
+        for(i = days -1 ;i<data.length;i++) {
+            var point = {x: data[i].date, y: Math.round((data[i][accumulativeField]-data[i-days+1][accumulativeField])/days)}
+            result.push(point)
+        }
     }
     return result
 }
@@ -215,7 +219,7 @@ function addNumericalStats(data) {
     var ncumul_conf = data['CH'].map(d => d.ncumul_conf).filter(s => s).slice(-1)[0]
     var ncumul_deceased = data['CH'].map(d => d.ncumul_deceased).filter(s => s).slice(-1)[0]
 
-    var maxDate = data['CH'].reduce((result, current) => Math.max(result, current.date), 0)
+    var maxDate = data['CH'].filter(sample => sample.ncumul_conf).reduce((result, current) => Math.max(result, current.date), 0)
 
     document.getElementById("totalConfirmed").innerHTML = formatNumber(ncumul_conf);
     document.getElementById("last7Days").innerHTML = `<span class="${lastWeek > priorWeek ? "down" : "up"}">${formatNumber(lastWeek)}</span>`
@@ -315,12 +319,14 @@ function init() {
     fetch('cantonConfig.json')
         .then(r =>   r.json())
         .then(r => cantonConfig = r)
+        // .then(x => { return fetch('unittest.csv')})
         // .then(x => { return fetch('data.csv')})
         .then(x => { return fetch('https://raw.githubusercontent.com/openZH/covid_19/master/COVID19_Fallzahlen_CH_total_v2.csv')})
         .then(r => r.text())
         .then(csvData => {
             newData = parseData(csvData)
             newData = scaffoldData(newData)
+            console.log(newData['CH'])
             addNumericalStats(newData)
             addCasesPer100000(newData)
             addCases(newData)
