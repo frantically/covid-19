@@ -2,7 +2,6 @@
 
 ## TODO
 ### Functionality
-* First grid line color not working - easier to see in light mode
 * Include +/- % in last week
 * hospitalization - how to show cantons?
 * tear drop?

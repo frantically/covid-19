@@ -38,7 +38,8 @@ function chartOptions() {
                     unit: 'month'
                 },
                 gridLines: {
-                    color: 'rgba(255rgba(0, 0, 0, 0.1)'
+                    color: 'rgba(255rgba(0, 0, 0, 0.1)',
+                    zeroLineColor: 'rgba(255rgba(0, 0, 0, 0.1)',
                 }
 
             }],
@@ -48,7 +49,8 @@ function chartOptions() {
                     maxTicksLimit: 5
                 },
                 gridLines: {
-                    color: 'rgba(255rgba(0, 0, 0, 0.1)'
+                    color: 'rgba(255rgba(0, 0, 0, 0.1)',
+                    zeroLineColor: 'rgba(255rgba(0, 0, 0, 0.1)',
                 }
             }]
         },
