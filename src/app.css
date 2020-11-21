@@ -51,7 +51,7 @@ h1 {
     font-weight: normal;
     padding-top: 20px;
     padding-left: 7px;
-  }
+}
 
 .chart {
     height: 250px;
@@ -83,4 +83,10 @@ h1 {
 .beta {
   color: red;
   font-weight: bold;
+}
+
+.chartSubtitle {
+  font-size: 12px;
+  margin-top: 28px;
+  color: grey;
 }

@@ -15,7 +15,7 @@
 	<div class="topnav">
 		<a href="/">&nbsp;&nbsp;&nbsp;<i class="fas fa-viruses"></i> frantically | COVID-19 | Switzerland</a>
 		<div class="topnav-right dataUpdate">
-			Latest Data: <span id="maxDate"></span> <span class="beta">BETA - NUMBERS IN VALIDATION</span> 
+			<span id="maxDate"></span> <span class="beta">BETA</span> 
 		</div>
 	</div>
 	<div class="container">
@@ -40,13 +40,19 @@
 		
 		<div class="row">
 			<div class="col-lg-6">
-				<h1>Cases per 100'000 (7 day avg)</h1>
+				<div class="row">
+					<div class="col-sm-6"><h1>Cases per 100'000</h1></div>
+					<div class="col-sm-6 text-right chartSubtitle">7 day rolling average</div>
+				</div>
 				<div class="chart">
 					<canvas id="casesPer100000"></canvas>
 				</div>
 			</div>
 			<div class="col-lg-6">
-				<h1>Deaths</h1>
+				<div class="row">
+					<div class="col-sm-6"><h1>Deaths</h1></div>
+					<div class="col-sm-6 text-right chartSubtitle">7 day rolling average</div>
+				</div>
 				<div class="chart">
 					<canvas id="deaths"></canvas>
 				</div>

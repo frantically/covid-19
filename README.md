@@ -2,14 +2,13 @@
 
 ## TODO
 ### Functionality
-* STRIP OUT THE EARLY DAYS WITH LITTLE DATA?
+* First grid line color not working - easier to see in light mode
 * Include +/- % in last week
-* Canton selector?
 * hospitalization - how to show cantons?
 * tear drop?
 * Compare to other countries?
-* Make it clear that the last complete day is used in the last week calc
 * VALIDATE DATA AGAINST CORONA-DATA.CH THIS IS LOWER
+* Canton selector?
 
 ### Missing Test Cases
 * getMovingAverage

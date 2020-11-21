@@ -81,7 +81,7 @@ function addNumericalStats(data) {
     document.getElementById("last7Days").innerHTML = `<span class="${lastWeek > priorWeek ? "down" : "up"}">${formatNumber(lastWeek)}</span>`
     document.getElementById("totalDeaths").innerHTML = formatNumber(ncumul_deceased)
     document.getElementById("last7Deaths").innerHTML = `<span class="${lastWeekDeceased > priorWeekDeceased ? "down" : "up"}">${formatNumber(lastWeekDeceased)}</span>`
-    document.getElementById("maxDate").innerHTML = `${formatDate(maxDate)}`
+    document.getElementById("maxDate").innerHTML = `CH Latest: ${formatDate(maxDate)}`
     }
 
 function addCases(data) {
@@ -155,9 +155,7 @@ function addHospital(data) {
 function outputDebug(newData) {
 }
 
-//TODO: could do two fetches in parallel
-function init() {
-
+function applyTheme() {
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         var element = document.body;
         element.classList.remove("light");
@@ -167,6 +165,12 @@ function init() {
         element.classList.add("light");
         element.classList.remove("dark");
     }
+}
+
+//TODO: could do two fetches in parallel
+function init() {
+    
+    applyTheme()
     fetch('cantonConfig.json')
         .then(r =>   r.json())
         .then(r => cantonConfig = r)
