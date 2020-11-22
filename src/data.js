@@ -154,4 +154,15 @@ export class CoronaStatistics {
     getMaxDate(canton) {
         return this._data[canton].filter(sample => sample.ncumul_conf).reduce((result, current) => Math.max(result, current.date), 0)
     }
+
+    getSeriesChange(canton, field, start, end = undefined) {
+        var cantonData = this._data[canton]
+        var slice = cantonData.map(d => d[field]).filter(s => s).slice(start, end)
+        console.log(slice)
+        return slice[slice.length-1] - slice[0]
+    }
+
+    getLastValue(canton, field) {
+        return this._data[canton].map(d => d[field]).filter(s => s).slice(-1)[0]
+    }
 }

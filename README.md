@@ -12,5 +12,4 @@
 
 ### Missing Test Cases
 * getMovingAverage
-* maxDate
 * lastWeek and priorWeek - will need longer data or configurable days

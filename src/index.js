@@ -64,20 +64,14 @@ function chartOptions() {
 
 function addNumericalStats(data) {
 
-    var chData = data.getData('CH')
+    var lastWeek = data.getSeriesChange('CH', 'ncumul_conf', -7)
+    var priorWeek = data.getSeriesChange('CH', 'ncumul_conf', -14, -7)
 
-    var lastWeekCumulative = chData.map(d => d.ncumul_conf).filter(s => s).slice(-7)
-    var priorWeekCumulative = chData.map(d => d.ncumul_conf).filter(s => s).slice(-14)
-    var lastWeek = lastWeekCumulative[6]-lastWeekCumulative[0]
-    var priorWeek = priorWeekCumulative[6]-priorWeekCumulative[0]
+    var lastWeekDeceased = data.getSeriesChange('CH', 'ncumul_deceased', -7)
+    var priorWeekDeceased = data.getSeriesChange('CH', 'ncumul_deceased', -14, -7)
 
-    var lastWeekDeceasedCumulative = chData.map(d => d.ncumul_deceased).filter(s => s).slice(-7)
-    var priorWeekDeceasedCumulative = chData.map(d => d.ncumul_deceased).filter(s => s).slice(-14)
-    var lastWeekDeceased = lastWeekDeceasedCumulative[6]-lastWeekDeceasedCumulative[0]
-    var priorWeekDeceased = priorWeekDeceasedCumulative[6]-priorWeekDeceasedCumulative[0]
-
-    var ncumul_conf = chData.map(d => d.ncumul_conf).filter(s => s).slice(-1)[0]
-    var ncumul_deceased = chData.map(d => d.ncumul_deceased).filter(s => s).slice(-1)[0]
+    var ncumul_conf = data.getLastValue('CH', 'ncumul_conf')
+    var ncumul_deceased = data.getLastValue('CH', 'ncumul_deceased')
 
     var maxDate = data.getMaxDate('CH')
 

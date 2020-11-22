@@ -38,3 +38,14 @@ test("Max Date for GR should be 10.11.2020", () => {
     var data = loadTestData()
     expect(data.getMaxDate('GR')).toBe(Date.parse("2020-11-10"))
 })
+
+test("Change in ncumul_conf for CH in the last 3 days should be 2", () => {
+    var data = loadTestData()
+    expect(data.getSeriesChange('CH', "ncumul_conf", -3)).toBe(2)
+    //console.log(data)
+})
+
+test("Change in ncumul_conf for CH for 6 days ago to  days ago to be 2", () => {
+    var data = loadTestData()
+    expect(data.getSeriesChange('CH', "ncumul_conf", -6, -2)).toBe(3)
+})
