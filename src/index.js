@@ -79,7 +79,7 @@ function addNumericalStats(data) {
     var ncumul_conf = chData.map(d => d.ncumul_conf).filter(s => s).slice(-1)[0]
     var ncumul_deceased = chData.map(d => d.ncumul_deceased).filter(s => s).slice(-1)[0]
 
-    var maxDate = chData.filter(sample => sample.ncumul_conf).reduce((result, current) => Math.max(result, current.date), 0)
+    var maxDate = data.getMaxDate('CH')
 
     document.getElementById("totalConfirmed").innerHTML = formatNumber(ncumul_conf);
     document.getElementById("last7Days").innerHTML = `<span class="${lastWeek > priorWeek ? "down" : "up"}">${formatNumber(lastWeek)}</span>`

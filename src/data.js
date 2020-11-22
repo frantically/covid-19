@@ -150,4 +150,8 @@ export class CoronaStatistics {
         }
         return result
     }
+
+    getMaxDate(canton) {
+        return this._data[canton].filter(sample => sample.ncumul_conf).reduce((result, current) => Math.max(result, current.date), 0)
+    }
 }

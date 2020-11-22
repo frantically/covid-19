@@ -28,3 +28,13 @@ test("ZH ncumul_conf for 05.11.2020 should be be carried from 04.11.2020", () =>
     expect(data.getData('ZH')[4].ncumul_conf).toBe(3); //carried
     expect(data.getData('CH')[4].ncumul_conf).toBe(4); //carried
 });
+
+test("Max Date for CH should be 09.11.2020", () => {
+    var data = loadTestData()
+    expect(data.getMaxDate('CH')).toBe(Date.parse("2020-11-09"))
+})
+
+test("Max Date for GR should be 10.11.2020", () => {
+    var data = loadTestData()
+    expect(data.getMaxDate('GR')).toBe(Date.parse("2020-11-10"))
+})
