@@ -2,6 +2,7 @@
 
 ## TODO
 ### Functionality
+* 2 week trends?
 * Include +/- % in last week
 * hospitalization - how to show cantons?
 * tear drop?

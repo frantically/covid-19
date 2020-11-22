@@ -1,4 +1,4 @@
-import { createDataFromCSV, formatDate, getMovingAverage, createSeriesData } from './data.js'
+import { CoronaStatistics, formatDate } from './data.js'
 
 var cantonConfig = {}
 
@@ -64,20 +64,22 @@ function chartOptions() {
 
 function addNumericalStats(data) {
 
-    var lastWeekCumulative = data['CH'].map(d => d.ncumul_conf).filter(s => s).slice(-7)
-    var priorWeekCumulative = data['CH'].map(d => d.ncumul_conf).filter(s => s).slice(-14)
+    var chData = data.getData('CH')
+
+    var lastWeekCumulative = chData.map(d => d.ncumul_conf).filter(s => s).slice(-7)
+    var priorWeekCumulative = chData.map(d => d.ncumul_conf).filter(s => s).slice(-14)
     var lastWeek = lastWeekCumulative[6]-lastWeekCumulative[0]
     var priorWeek = priorWeekCumulative[6]-priorWeekCumulative[0]
 
-    var lastWeekDeceasedCumulative = data['CH'].map(d => d.ncumul_deceased).filter(s => s).slice(-7)
-    var priorWeekDeceasedCumulative = data['CH'].map(d => d.ncumul_deceased).filter(s => s).slice(-14)
+    var lastWeekDeceasedCumulative = chData.map(d => d.ncumul_deceased).filter(s => s).slice(-7)
+    var priorWeekDeceasedCumulative = chData.map(d => d.ncumul_deceased).filter(s => s).slice(-14)
     var lastWeekDeceased = lastWeekDeceasedCumulative[6]-lastWeekDeceasedCumulative[0]
     var priorWeekDeceased = priorWeekDeceasedCumulative[6]-priorWeekDeceasedCumulative[0]
 
-    var ncumul_conf = data['CH'].map(d => d.ncumul_conf).filter(s => s).slice(-1)[0]
-    var ncumul_deceased = data['CH'].map(d => d.ncumul_deceased).filter(s => s).slice(-1)[0]
+    var ncumul_conf = chData.map(d => d.ncumul_conf).filter(s => s).slice(-1)[0]
+    var ncumul_deceased = chData.map(d => d.ncumul_deceased).filter(s => s).slice(-1)[0]
 
-    var maxDate = data['CH'].filter(sample => sample.ncumul_conf).reduce((result, current) => Math.max(result, current.date), 0)
+    var maxDate = chData.filter(sample => sample.ncumul_conf).reduce((result, current) => Math.max(result, current.date), 0)
 
     document.getElementById("totalConfirmed").innerHTML = formatNumber(ncumul_conf);
     document.getElementById("last7Days").innerHTML = `<span class="${lastWeek > priorWeek ? "down" : "up"}">${formatNumber(lastWeek)}</span>`
@@ -93,8 +95,8 @@ function addCases(data) {
         type: 'line',
         data: {
             datasets: [ 
-                chartSeries(createSeriesData(data['ZH'], 'ncumul_conf'), "ZH", cantonConfig.ZH.color, 1),
-                chartSeries(createSeriesData(data['CH'], 'ncumul_conf'), "CH", cantonConfig.CH.color, 1),
+                chartSeries(data.getSeries('ZH', 'ncumul_conf'), "ZH", cantonConfig.ZH.color, 1),
+                chartSeries(data.getSeries('CH', 'ncumul_conf'), "CH", cantonConfig.CH.color, 1),
             ]
         },
         options: chartOptions()
@@ -109,8 +111,8 @@ function addDeaths(data) {
         type: 'line',
         data: {
             datasets: [ 
-                chartSeries(getMovingAverage(data['ZH'], 'ncumul_deceased', 7), 'ZH', cantonConfig.ZH.color),
-                chartSeries(getMovingAverage(data['CH'], 'ncumul_deceased', 7), 'CH', cantonConfig.CH.color),
+                chartSeries(data.getMovingAverage('ZH', 'ncumul_deceased', 7), 'ZH', cantonConfig.ZH.color),
+                chartSeries(data.getMovingAverage('CH', 'ncumul_deceased', 7), 'CH', cantonConfig.CH.color),
             ]
         },
         options: chartOptions()
@@ -128,10 +130,10 @@ function addCasesPer100000(data) {
         type: 'line',
         data: {
             datasets: [ 
-                chartSeries(per100k(getMovingAverage(data['ZH'], 'ncumul_conf', 7), 'ZH'), 'ZH', cantonConfig.ZH.color),
-                chartSeries(per100k(getMovingAverage(data['ZG'], 'ncumul_conf', 7), 'ZG'), 'ZG', cantonConfig.ZG.color),
-                chartSeries(per100k(getMovingAverage(data['GR'], 'ncumul_conf', 7), 'GR'), 'GR', cantonConfig.GR.color),
-                chartSeries(per100k(getMovingAverage(data['CH'], 'ncumul_conf', 7), 'CH'), 'CH', cantonConfig.CH.color),
+                chartSeries(per100k(data.getMovingAverage('ZH', 'ncumul_conf', 7), 'ZH'), 'ZH', cantonConfig.ZH.color),
+                chartSeries(per100k(data.getMovingAverage('ZG', 'ncumul_conf', 7), 'ZG'), 'ZG', cantonConfig.ZG.color),
+                chartSeries(per100k(data.getMovingAverage('GR', 'ncumul_conf', 7), 'GR'), 'GR', cantonConfig.GR.color),
+                chartSeries(per100k(data.getMovingAverage('CH', 'ncumul_conf', 7), 'CH'), 'CH', cantonConfig.CH.color),
             ]
         },
         options: chartOptions()
@@ -145,16 +147,17 @@ function addHospital(data) {
         type: 'line',
         data: {
             datasets: [
-                chartSeries(createSeriesData(data['ZH'], 'current_hosp'), 'Hospitalized', [252, 191, 73]),
-                chartSeries(createSeriesData(data['ZH'], 'current_icu'), 'ICU', [247, 127, 0]),
-                chartSeries(createSeriesData(data['ZH'], 'current_vent'), 'Ventilated', [214, 40, 40]),
+                chartSeries(data.getSeries('ZH', 'current_hosp'), 'Hospitalized', [252, 191, 73]),
+                chartSeries(data.getSeries('ZH', 'current_icu'), 'ICU', [247, 127, 0]),
+                chartSeries(data.getSeries('ZH', 'current_vent'), 'Ventilated', [214, 40, 40]),
             ]
         },
         options: chartOptions()
     });
 }
 
-function outputDebug(newData) {
+function outputDebug(data) {
+    console.log(data.getData('CH'))
 }
 
 function applyTheme() {
@@ -180,13 +183,12 @@ function init() {
         .then(x => { return fetch('https://raw.githubusercontent.com/openZH/covid_19/master/COVID19_Fallzahlen_CH_total_v2.csv')})
         .then(r => r.text())
         .then(csvData => {
-            var data = createDataFromCSV(csvData)
-            console.log(data['CH'])
+            var data = new CoronaStatistics(csvData)
             addNumericalStats(data)
             addCasesPer100000(data)
+            addDeaths(data)
             addCases(data)
             addHospital(data)
-            addDeaths(data)
             outputDebug(data)
         })
 }
