@@ -1,8 +1,9 @@
 .light {
   --background: white;
-  --foreground: #black;
+  --foreground: black;
   --foreground-subtle: grey;
   --borders: #DDD;
+  --gridlines: rgba(0, 0, 0, 0.1);
 }
 
 .dark {
@@ -10,6 +11,7 @@
   --foreground: white;
   --foreground-subtle: grey;
   --borders: #DDD;
+  --gridlines: rgba(255, 255, 255, 0.2);
 }
 
 body {
@@ -97,7 +99,7 @@ h1 {
 
 .chartSubtitle {
   font-size: 12px;
-  margin-top: 28px; 
+  margin-top: 28px;
   color: grey;
 }
 

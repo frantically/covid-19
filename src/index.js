@@ -22,6 +22,11 @@ function chartSeries(data, label, rgb, alpha = 1) {
 }
 
 function chartOptions(xAxisUnit = 'month') {
+
+    var style = getComputedStyle(document.body)
+    var gridLineColor = style.getPropertyValue('--gridlines')
+
+
     return {
         responsive: true,
         maintainAspectRatio: false,
@@ -38,8 +43,8 @@ function chartOptions(xAxisUnit = 'month') {
                     unit: xAxisUnit
                 },
                 gridLines: {
-                    color: 'rgba(255rgba(0, 0, 0, 0.1)',
-                    zeroLineColor: 'rgba(255rgba(0, 0, 0, 0.1)',
+                    color: gridLineColor,
+                    zeroLineColor: gridLineColor,
                 }
             }],
             yAxes: [{
@@ -48,9 +53,9 @@ function chartOptions(xAxisUnit = 'month') {
                     maxTicksLimit: 5
                 },
                 gridLines: {
-                    color: 'rgba(255rgba(0, 0, 0, 0.1)',
-                    zeroLineColor: 'rgba(255rgba(0, 0, 0, 0.1)',
-                }
+                    color: gridLineColor,
+                    zeroLineColor: gridLineColor,
+                }   
             }]
         },
         legend: {
