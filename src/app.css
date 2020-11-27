@@ -43,6 +43,11 @@ body {
   font-size: 17px;
 }
 
+.beta {
+  color: red;
+  font-weight: bold;
+}
+
 .dataUpdate {
   color: var(--foreground-subtle);
   padding-top: 17px;
@@ -63,11 +68,6 @@ h1 {
 
 .chartSmall {
   height: 125px;
-}
-
-.highlights {
-  padding-top: 20px;
-  border-bottom: solid 1px var(--borders);
 }
 
 .highlightLabel {
@@ -92,14 +92,10 @@ h1 {
   color: #ec524b;
 }
 
-.beta {
-  color: red;
-  font-weight: bold;
+.jumbotron {
+  background-color: var(--background);
+  border-bottom: 1px solid var(--borders);
+  padding: 20px 0px 10px 0px;
+  margin-bottom: 0px;
+  border-radius: 0px;
 }
-
-.chartSubtitle {
-  font-size: 12px;
-  margin-top: 28px;
-  color: grey;
-}
-
