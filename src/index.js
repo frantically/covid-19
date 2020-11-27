@@ -97,9 +97,13 @@ function addNumericalStats(data) {
 
     var lastWeek = data.getSeriesChange('CH', 'ncumul_conf', -7)
     var priorWeek = data.getSeriesChange('CH', 'ncumul_conf', -14, -7)
+    var casesMovePercentage = Math.round(((lastWeek-priorWeek)/priorWeek)*100)
+    console.log(casesMovePercentage)
 
     var lastWeekDeceased = data.getSeriesChange('CH', 'ncumul_deceased', -7)
     var priorWeekDeceased = data.getSeriesChange('CH', 'ncumul_deceased', -14, -7)
+    var deathsMovePercentage = Math.round(((lastWeekDeceased-priorWeekDeceased)/priorWeekDeceased)*100)
+    console.log(deathsMovePercentage)
 
     var ncumul_conf = data.getLastValue('CH', 'ncumul_conf')
     var ncumul_deceased = data.getLastValue('CH', 'ncumul_deceased')
@@ -107,9 +111,9 @@ function addNumericalStats(data) {
     var maxDate = data.getMaxDate('CH')
 
     document.getElementById("totalConfirmed").innerHTML = formatNumber(ncumul_conf);
-    document.getElementById("last7Days").innerHTML = `<span class="${lastWeek > priorWeek ? "down" : "up"}">${formatNumber(lastWeek)}</span>`
+    document.getElementById("last7Days").innerHTML = `<span class="${lastWeek > priorWeek ? "down" : "up"}">${formatNumber(lastWeek)} <span class="highlightChange">${casesMovePercentage}%</span></span>`
     document.getElementById("totalDeaths").innerHTML = formatNumber(ncumul_deceased)
-    document.getElementById("last7Deaths").innerHTML = `<span class="${lastWeekDeceased > priorWeekDeceased ? "down" : "up"}">${formatNumber(lastWeekDeceased)}</span>`
+    document.getElementById("last7Deaths").innerHTML = `<span class="${lastWeekDeceased > priorWeekDeceased ? "down" : "up"}">${formatNumber(lastWeekDeceased)} <span class="highlightChange">${deathsMovePercentage}%</span></span>`
     document.getElementById("maxDate").innerHTML = `CH Latest: ${formatDate(maxDate)}`
 }
 
