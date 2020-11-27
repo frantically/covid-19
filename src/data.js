@@ -158,7 +158,6 @@ export class CoronaStatistics {
     getSeriesChange(canton, field, start, end = undefined) {
         var cantonData = this._data[canton]
         var slice = cantonData.map(d => d[field]).filter(s => s).slice(start, end)
-        console.log(slice)
         return slice[slice.length-1] - slice[0]
     }
 

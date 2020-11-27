@@ -98,12 +98,10 @@ function addNumericalStats(data) {
     var lastWeek = data.getSeriesChange('CH', 'ncumul_conf', -7)
     var priorWeek = data.getSeriesChange('CH', 'ncumul_conf', -14, -7)
     var casesMovePercentage = Math.round(((lastWeek-priorWeek)/priorWeek)*100)
-    console.log(casesMovePercentage)
 
     var lastWeekDeceased = data.getSeriesChange('CH', 'ncumul_deceased', -7)
     var priorWeekDeceased = data.getSeriesChange('CH', 'ncumul_deceased', -14, -7)
     var deathsMovePercentage = Math.round(((lastWeekDeceased-priorWeekDeceased)/priorWeekDeceased)*100)
-    console.log(deathsMovePercentage)
 
     var ncumul_conf = data.getLastValue('CH', 'ncumul_conf')
     var ncumul_deceased = data.getLastValue('CH', 'ncumul_deceased')
