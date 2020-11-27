@@ -21,7 +21,7 @@ function chartSeries(data, label, rgb, alpha = 1) {
     return result
 }
 
-function chartOptions() {
+function chartOptions(xAxisUnit = 'month') {
     return {
         responsive: true,
         maintainAspectRatio: false,
@@ -35,13 +35,12 @@ function chartOptions() {
             xAxes: [{
                 type: 'time',
                 time: {
-                    unit: 'month'
+                    unit: xAxisUnit
                 },
                 gridLines: {
                     color: 'rgba(255rgba(0, 0, 0, 0.1)',
                     zeroLineColor: 'rgba(255rgba(0, 0, 0, 0.1)',
                 }
-
             }],
             yAxes: [{
                 type: 'linear',
@@ -59,6 +58,38 @@ function chartOptions() {
             labels: {usePointStyle: true}
         }
         
+    }
+}
+
+function chartOptionsSmall() {
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        elements: {
+            point: {
+                pointStyle: "line",
+                radius: 0
+            }
+        },
+        scales: {
+            xAxes: [{
+                display: false,
+                type: 'time',
+            }],
+            yAxes: [{
+                display: false,
+                type: 'linear',
+                ticks: {
+                    beginAtZero: true,
+                },
+            }]
+        },
+        legend: {
+            display: false,
+            position: 'bottom',
+            labels: {usePointStyle: true}
+        }
+       
     }
 }
 
@@ -80,36 +111,17 @@ function addNumericalStats(data) {
     document.getElementById("totalDeaths").innerHTML = formatNumber(ncumul_deceased)
     document.getElementById("last7Deaths").innerHTML = `<span class="${lastWeekDeceased > priorWeekDeceased ? "down" : "up"}">${formatNumber(lastWeekDeceased)}</span>`
     document.getElementById("maxDate").innerHTML = `CH Latest: ${formatDate(maxDate)}`
-    }
-
-function addCases(data) {
-    var ctx = document.getElementById('cases');
-
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            datasets: [ 
-                chartSeries(data.getSeries('ZH', 'ncumul_conf'), "ZH", cantonConfig.ZH.color, 1),
-                chartSeries(data.getSeries('CH', 'ncumul_conf'), "CH", cantonConfig.CH.color, 1),
-            ]
-        },
-        options: chartOptions()
-    });
 }
 
-function addDeaths(data) {
-
-    var ctx = document.getElementById('deaths');
+function addChart(element, dataSeries, options) {
+    var ctx = document.getElementById(element);
 
     new Chart(ctx, {
         type: 'line',
         data: {
-            datasets: [ 
-                chartSeries(data.getMovingAverage('ZH', 'ncumul_deceased', 7), 'ZH', cantonConfig.ZH.color),
-                chartSeries(data.getMovingAverage('CH', 'ncumul_deceased', 7), 'CH', cantonConfig.CH.color),
-            ]
+            datasets: dataSeries
         },
-        options: chartOptions()
+        options: options
     });
 }
 
@@ -117,37 +129,57 @@ function per100k(series, canton) {
     return series.map(point => { return {x: point.x, y: point.y/(cantonConfig[canton].population/100000)}})
 }
 
-function addCasesPer100000(data) {
-    var ctx = document.getElementById('casesPer100000');
+function addCases(data) {
+    addChart('cases', [ 
+            chartSeries(data.getSeries('ZH', 'ncumul_conf'), "ZH", cantonConfig.ZH.color, 1),
+            chartSeries(data.getSeries('CH', 'ncumul_conf'), "CH", cantonConfig.CH.color, 1),
+        ],
+        chartOptions())
+}
 
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            datasets: [ 
-                chartSeries(per100k(data.getMovingAverage('ZH', 'ncumul_conf', 7), 'ZH'), 'ZH', cantonConfig.ZH.color),
-                chartSeries(per100k(data.getMovingAverage('ZG', 'ncumul_conf', 7), 'ZG'), 'ZG', cantonConfig.ZG.color),
-                chartSeries(per100k(data.getMovingAverage('GR', 'ncumul_conf', 7), 'GR'), 'GR', cantonConfig.GR.color),
-                chartSeries(per100k(data.getMovingAverage('CH', 'ncumul_conf', 7), 'CH'), 'CH', cantonConfig.CH.color),
-            ]
-        },
-        options: chartOptions()
-    });
+function addDeaths(data) {
+    addChart('deaths', [ 
+            chartSeries(data.getMovingAverage('ZH', 'ncumul_deceased', 7), 'ZH', cantonConfig.ZH.color),
+            chartSeries(data.getMovingAverage('CH', 'ncumul_deceased', 7), 'CH', cantonConfig.CH.color),
+        ],
+        chartOptions())
+}
+
+function addCasesPer100000(data) {
+    addChart('casesPer100000', [
+            chartSeries(per100k(data.getMovingAverage('ZH', 'ncumul_conf', 7), 'ZH'), 'ZH', cantonConfig.ZH.color),
+            chartSeries(per100k(data.getMovingAverage('ZG', 'ncumul_conf', 7), 'ZG'), 'ZG', cantonConfig.ZG.color),
+            chartSeries(per100k(data.getMovingAverage('GR', 'ncumul_conf', 7), 'GR'), 'GR', cantonConfig.GR.color),
+            chartSeries(per100k(data.getMovingAverage('CH', 'ncumul_conf', 7), 'CH'), 'CH', cantonConfig.CH.color),
+        ],
+        chartOptions())
 }
 
 function addHospital(data) {
-    var ctx = document.getElementById('hospitalized');
+    addChart('hospitalized', [
+            chartSeries(data.getSeries('ZH', 'current_hosp'), 'Hospitalized', [252, 191, 73]),
+            chartSeries(data.getSeries('ZH', 'current_icu'), 'ICU', [247, 127, 0]),
+            chartSeries(data.getSeries('ZH', 'current_vent'), 'Ventilated', [214, 40, 40]),
+        ],
+        chartOptions())
+}
 
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            datasets: [
-                chartSeries(data.getSeries('ZH', 'current_hosp'), 'Hospitalized', [252, 191, 73]),
-                chartSeries(data.getSeries('ZH', 'current_icu'), 'ICU', [247, 127, 0]),
-                chartSeries(data.getSeries('ZH', 'current_vent'), 'Ventilated', [214, 40, 40]),
-            ]
-        },
-        options: chartOptions()
-    });
+function addCasesLastMonth(data) {
+    addChart('chartCasesLastMonth', [
+        chartSeries(per100k(data.getMovingAverage('ZH', 'ncumul_conf', 7).slice(-30), 'ZH'), 'ZH', cantonConfig.ZH.color),
+        chartSeries(per100k(data.getMovingAverage('ZG', 'ncumul_conf', 7).slice(-30), 'ZG'), 'ZG', cantonConfig.ZG.color),
+        chartSeries(per100k(data.getMovingAverage('GR', 'ncumul_conf', 7).slice(-30), 'GR'), 'GR', cantonConfig.GR.color),
+        chartSeries(per100k(data.getMovingAverage('CH', 'ncumul_conf', 7).slice(-30), 'CH'), 'CH', cantonConfig.CH.color),
+    ],
+    chartOptionsSmall())
+}
+
+function addDeathsLastMonth(data) {
+    addChart('chartDeathsLastMonth', [
+        chartSeries(data.getMovingAverage('ZH', 'ncumul_deceased', 7).slice(-30), 'ZH', cantonConfig.ZH.color),
+        chartSeries(data.getMovingAverage('CH', 'ncumul_deceased', 7).slice(-30), 'CH', cantonConfig.CH.color),
+    ],
+    chartOptionsSmall())
 }
 
 function outputDebug(data) {
@@ -184,7 +216,12 @@ function init() {
             addCases(data)
             addHospital(data)
             outputDebug(data)
+            addCasesLastMonth(data)
+            addDeathsLastMonth(data)
         })
 }
+
+
+
 
 init()

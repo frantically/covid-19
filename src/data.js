@@ -1,5 +1,5 @@
 const SAMPLE_DATA_FIELDS_SOURCE = ["ncumul_tested" , "ncumul_conf" , "new_hosp" , "current_hosp", "current_icu" , "current_vent" , "ncumul_released" , "ncumul_deceased", "current_isolated", "current_quarantined" , "current_quarantined_riskareatravel", "current_quarantined_total" ]
-const SAMPLE_DATA_FIELDS_CARRY = ["ncumul_conf", "ncumul_deceased"]
+const SAMPLE_DATA_FIELDS_CARRY = ["ncumul_conf", "ncumul_deceased", "current_hosp"]
 const SAMPLE_DATA_FIELDS_ALL_NEW = SAMPLE_DATA_FIELDS_SOURCE.concat(["ncumul_conf_raw", "ncumul_deceased_raw"])
 
 const ONE_DAY = 24 * 60 * 60 * 1000
