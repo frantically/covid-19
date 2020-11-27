@@ -2,12 +2,14 @@
   --background: white;
   --foreground: #black;
   --foreground-subtle: grey;
+  --borders: #DDD;
 }
 
 .dark {
   --background: black;
   --foreground: white;
   --foreground-subtle: grey;
+  --borders: #DDD;
 }
 
 body {
@@ -21,7 +23,7 @@ body {
 
 .topnav {
   overflow: hidden;
-  border-bottom: 1px solid #DDD;
+  border-bottom: 1px solid var(--borders);
 }
 
 .topnav a {
@@ -63,7 +65,7 @@ h1 {
 
 .highlights {
   padding-top: 20px;
-  border-bottom: solid 1px var(--foreground-subtle);
+  border-bottom: solid 1px var(--borders);
 }
 
 .highlightLabel {
@@ -95,7 +97,7 @@ h1 {
 
 .chartSubtitle {
   font-size: 12px;
-  margin-top: 28px;
+  margin-top: 28px; 
   color: grey;
 }
 
