@@ -193,15 +193,28 @@ function outputDebug(data) {
     console.log(data.getData('CH'))
 }
 
+function isLightTheme() {
+    var url = new URL(location.href);
+    var themeOverride = url.searchParams.get("theme");
+    var light = true
+    if(themeOverride) {
+        if(themeOverride === "dark") {
+            light = false
+        }
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        light = false
+    }
+    return light
+}
+
 function applyTheme() {
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        var element = document.body;
-        element.classList.remove("light");
-        element.classList.add("dark");
-    } else {
-        var element = document.body;
+    var element = document.body;
+    if (isLightTheme()) {
         element.classList.add("light");
         element.classList.remove("dark");
+    } else {
+        element.classList.remove("light");
+        element.classList.add("dark");
     }
 }
 
