@@ -218,10 +218,9 @@ function applyTheme() {
     }
 }
 
-//TODO: could do two fetches in parallel
 function init() {
     
-    applyTheme()
+    //applyTheme()
     fetch('cantonConfig.json')
         .then(r =>   r.json())
         .then(r => cantonConfig = r)
