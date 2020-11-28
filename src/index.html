@@ -19,50 +19,47 @@
 			<span id="maxDate"></span> | * Day 7 Rolling Average</span> 
 		</div>
 	</div>
-	<div class="jumbotron">
-		<div class="container">
-			<div class="row">
-				<div class="col-sm-3 highlight">
-					<div class="highlightLabel">Cases Total</div>
-					<div id="totalConfirmed">&nbsp;</div>
-					<div class="highlightLabel">Cases Last Week</div>
-					<div id="last7Days">&nbsp;</div>
+	<div class="container">
+		<div class="row highlights">
+			<div class="col-sm-3 highlight">
+				<div class="highlightLabel">Cases Total</div>
+				<div id="totalConfirmed">&nbsp;</div>
+				<div class="highlightLabel">Cases Last Week</div>
+				<div id="last7Days">&nbsp;</div>
+			</div>
+			<div class="col-sm-3 highlight">
+				<div class="highlightLabel">Deaths Total</div>
+				<div id="totalDeaths">&nbsp;</div>
+				<div class="highlightLabel">Deaths Last Week</div>
+				<div id="last7Deaths">&nbsp;</div>
+			</div>
+			<div class="col-sm-3 highlight">
+				<div class="highlightLabel">Cases per 100'000 Last Month<sup>*</sup></div>
+				<div class="chartSmall">
+					<canvas id="chartCasesLastMonth"></canvas>
 				</div>
-				<div class="col-sm-3 highlight">
-					<div class="highlightLabel">Deaths Total</div>
-					<div id="totalDeaths">&nbsp;</div>
-					<div class="highlightLabel">Deaths Last Week</div>
-					<div id="last7Deaths">&nbsp;</div>
-				</div>
-				<div class="col-sm-3 highlight">
-					<div class="highlightLabel">Cases per 100'000 Last Month<sup>*</sup></div>
-					<div class="chartSmall">
-						<canvas id="chartCasesLastMonth"></canvas>
-					</div>
-				</div>
-				<div class="col-sm-3 highlight">
-					<div class="highlightLabel">Deaths Last Month<sup>*</sup></div>
-					<div class="chartSmall">
-						<canvas id="chartDeathsLastMonth"></canvas>
-					</div>
+			</div>
+			<div class="col-sm-3 highlight">
+				<div class="highlightLabel">Deaths Last Month<sup>*</sup></div>
+				<div class="chartSmall">
+					<canvas id="chartDeathsLastMonth"></canvas>
 				</div>
 			</div>
 		</div>
-	</div>
-	<div class="container">
 		<div class="row">
+			<div class="col-md-12">
+				<div class="hr"></div>
+			</div>
+		</div>
+		<div class="row ">
 			<div class="col-lg-6">
-				<div class="row">
-					<h1>Cases per 100'000<sup>*</sup></h1>
-				</div>
+				<h1>Cases per 100'000<sup>*</sup></h1>
 				<div class="chart">
 					<canvas id="casesPer100000"></canvas>
 				</div>
 			</div>
 			<div class="col-lg-6">
-				<div class="row">
-					<h1>Deaths<sup>*</sup></h1>
-				</div>
+				<h1>Deaths<sup>*</sup></h1>
 				<div class="chart">
 					<canvas id="deaths"></canvas>
 				</div>
