@@ -1,6 +1,6 @@
 const SAMPLE_DATA_FIELDS_SOURCE = ["ncumul_tested" , "ncumul_conf" , "new_hosp" , "current_hosp", "current_icu" , "current_vent" , "ncumul_released" , "ncumul_deceased", "current_isolated", "current_quarantined" , "current_quarantined_riskareatravel", "current_quarantined_total" ]
 const SAMPLE_DATA_FIELDS_CARRY = ["ncumul_conf", "ncumul_deceased", "current_hosp"]
-const SAMPLE_DATA_FIELDS_ALL_NEW = SAMPLE_DATA_FIELDS_SOURCE.concat(["ncumul_conf_raw", "ncumul_deceased_raw"])
+const SAMPLE_DATA_FIELDS_ALL_NEW = SAMPLE_DATA_FIELDS_SOURCE.concat(["ncumul_conf_raw", "ncumul_deceased_raw", "raw"])
 
 const ONE_DAY = 24 * 60 * 60 * 1000
 const MIN_START_DATE = Date.parse("2020-03-01")
@@ -19,12 +19,13 @@ export class CoronaStatistics {
 
     _scaffoldData(source) {
         var minMax = source.reduce((a, c) => {
+            c.raw = 1 // leverage the minMax calculation to add a new attribute to show raw values - unclear code
             a.min = Math.min(c.date, a.min)
             a.max = Math.max(c.date, a.max)
             return a
         }, {min: Number.MAX_VALUE , max: 0})
         minMax.min = Math.max(MIN_START_DATE, minMax.min)
-        
+
         console.log(`Date Range in data: ${formatDate(minMax.min)} - ${formatDate(minMax.max)}`)
         var days = []
         for(var i = minMax.min;i<= minMax.max;i = i+ONE_DAY) {
@@ -35,7 +36,7 @@ export class CoronaStatistics {
         cantons.forEach(canton => {
             var cantonData = this._getCantonDataByDate(source, canton)
             var cantonScaffoldedData = days.map(date => {
-                return cantonData[date] ? cantonData[date] : {date: date, abbreviation_canton_and_fl: canton}
+                return cantonData[date] ? cantonData[date] : {date: date, abbreviation_canton_and_fl: canton, raw: 0}
             })
             result[canton] = cantonScaffoldedData
         })

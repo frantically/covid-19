@@ -102,3 +102,15 @@ h1 {
 .showOff {
   background: red;
 }
+
+
+.footer {
+  margin-top: 20px;
+  color: var(--foreground-subtle);
+  text-align: center;
+  font-size: 14px;
+}
+
+.footer > a {
+  color: var(--foreground-subtle);
+}
