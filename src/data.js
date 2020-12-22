@@ -165,4 +165,12 @@ export class CoronaStatistics {
     getLastValue(canton, field) {
         return this._data[canton].map(d => d[field]).filter(s => s).slice(-1)[0]
     }
+    
+    getLastWeek(canton, field) {
+        return this.getSeriesChange(canton, field, -7)
+    }
+
+    getPriorWeek(canton, field) {
+        return this.getSeriesChange(canton, field, -14, -7)
+    }
 }

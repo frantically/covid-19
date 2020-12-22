@@ -1,4 +1,5 @@
 import { CoronaStatistics, formatDate } from './data.js'
+import { CoronaStatisticsFOPH } from './foph.js'
 
 var cantonConfig = {}
 
@@ -103,12 +104,12 @@ function chartOptionsSmall() {
 
 function addNumericalStats(data) {
 
-    var lastWeek = data.getSeriesChange('CH', SERIES_CASES, -7)
-    var priorWeek = data.getSeriesChange('CH', SERIES_CASES, -14, -7)
+    var lastWeek = data.getLastWeek('CH', SERIES_CASES)
+    var priorWeek = data.getPriorWeek('CH', SERIES_CASES)
     var casesMovePercentage = Math.round(((lastWeek-priorWeek)/priorWeek)*100)
 
-    var lastWeekDeceased = data.getSeriesChange('CH', SERIES_DEATHS, -7)
-    var priorWeekDeceased = data.getSeriesChange('CH', SERIES_DEATHS, -14, -7)
+    var lastWeekDeceased = data.getLastWeek('CH', SERIES_DEATHS)
+    var priorWeekDeceased = data.getPriorWeek('CH', SERIES_DEATHS)
     var deathsMovePercentage = Math.round(((lastWeekDeceased-priorWeekDeceased)/priorWeekDeceased)*100)
 
     var ncumul_conf = data.getLastValue('CH', SERIES_CASES)
@@ -193,7 +194,8 @@ function addDeathsLastMonth(data) {
 }
 
 function outputDebug(data) {
-    console.log(data.getData('CH'))
+    // console.log(data.getData('CH'))
+    console.log(data.getSeries('ZH', SERIES_CASES))
 }
 
 function isLightTheme() {
@@ -243,7 +245,28 @@ function init() {
         })
 }
 
+function initFoph() {
+    
+    //applyTheme()
+    fetch('cantonConfig.json')
+        .then(r =>   r.json())
+        .then(r => cantonConfig = r)
+        .then(x => { return fetch('foph.json')})
+        .then(r => r.json())
+        .then(json => {
+            var data = new CoronaStatisticsFOPH(json)
+            addNumericalStats(data)
+            addCasesPer100000(data)
+            addDeaths(data)
+            addCases(data)
+            addHospital(data)
+            outputDebug(data)
+            addCasesLastMonth(data)
+            addDeathsLastMonth(data)
+        })
+}
 
 
 
 init()
+// initFoph()
