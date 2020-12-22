@@ -2,6 +2,9 @@ import { CoronaStatistics, formatDate } from './data.js'
 
 var cantonConfig = {}
 
+const SERIES_CASES = "ncumul_conf"
+const SERIES_DEATHS = "ncumul_deceased"
+
 function formatNumber(n) {
     return new Number(n).toLocaleString('de-CH')
 }
@@ -100,16 +103,16 @@ function chartOptionsSmall() {
 
 function addNumericalStats(data) {
 
-    var lastWeek = data.getSeriesChange('CH', 'ncumul_conf', -7)
-    var priorWeek = data.getSeriesChange('CH', 'ncumul_conf', -14, -7)
+    var lastWeek = data.getSeriesChange('CH', SERIES_CASES, -7)
+    var priorWeek = data.getSeriesChange('CH', SERIES_CASES, -14, -7)
     var casesMovePercentage = Math.round(((lastWeek-priorWeek)/priorWeek)*100)
 
-    var lastWeekDeceased = data.getSeriesChange('CH', 'ncumul_deceased', -7)
-    var priorWeekDeceased = data.getSeriesChange('CH', 'ncumul_deceased', -14, -7)
+    var lastWeekDeceased = data.getSeriesChange('CH', SERIES_DEATHS, -7)
+    var priorWeekDeceased = data.getSeriesChange('CH', SERIES_DEATHS, -14, -7)
     var deathsMovePercentage = Math.round(((lastWeekDeceased-priorWeekDeceased)/priorWeekDeceased)*100)
 
-    var ncumul_conf = data.getLastValue('CH', 'ncumul_conf')
-    var ncumul_deceased = data.getLastValue('CH', 'ncumul_deceased')
+    var ncumul_conf = data.getLastValue('CH', SERIES_CASES)
+    var ncumul_deceased = data.getLastValue('CH', SERIES_DEATHS)
 
     var maxDate = data.getMaxDate('CH')
 
@@ -138,26 +141,26 @@ function per100k(series, canton) {
 
 function addCases(data) {
     addChart('cases', [ 
-            chartSeries(data.getSeries('ZH', 'ncumul_conf'), "ZH", cantonConfig.ZH.color, 1),
-            chartSeries(data.getSeries('CH', 'ncumul_conf'), "CH", cantonConfig.CH.color, 1),
+            chartSeries(data.getSeries('ZH', SERIES_CASES), "ZH", cantonConfig.ZH.color, 1),
+            chartSeries(data.getSeries('CH', SERIES_CASES), "CH", cantonConfig.CH.color, 1),
         ],
         chartOptions())
 }
 
 function addDeaths(data) {
     addChart('deaths', [ 
-            chartSeries(data.getMovingAverage('ZH', 'ncumul_deceased', 7), 'ZH', cantonConfig.ZH.color),
-            chartSeries(data.getMovingAverage('CH', 'ncumul_deceased', 7), 'CH', cantonConfig.CH.color),
+            chartSeries(data.getMovingAverage('ZH', SERIES_DEATHS, 7), 'ZH', cantonConfig.ZH.color),
+            chartSeries(data.getMovingAverage('CH', SERIES_DEATHS, 7), 'CH', cantonConfig.CH.color),
         ],
         chartOptions())
 }
 
 function addCasesPer100000(data) {
     addChart('casesPer100000', [
-            chartSeries(per100k(data.getMovingAverage('ZH', 'ncumul_conf', 7), 'ZH'), 'ZH', cantonConfig.ZH.color),
-            chartSeries(per100k(data.getMovingAverage('ZG', 'ncumul_conf', 7), 'ZG'), 'ZG', cantonConfig.ZG.color),
-            chartSeries(per100k(data.getMovingAverage('GR', 'ncumul_conf', 7), 'GR'), 'GR', cantonConfig.GR.color),
-            chartSeries(per100k(data.getMovingAverage('CH', 'ncumul_conf', 7), 'CH'), 'CH', cantonConfig.CH.color),
+            chartSeries(per100k(data.getMovingAverage('ZH', SERIES_CASES, 7), 'ZH'), 'ZH', cantonConfig.ZH.color),
+            chartSeries(per100k(data.getMovingAverage('ZG', SERIES_CASES, 7), 'ZG'), 'ZG', cantonConfig.ZG.color),
+            chartSeries(per100k(data.getMovingAverage('GR', SERIES_CASES, 7), 'GR'), 'GR', cantonConfig.GR.color),
+            chartSeries(per100k(data.getMovingAverage('CH', SERIES_CASES, 7), 'CH'), 'CH', cantonConfig.CH.color),
         ],
         chartOptions())
 }
@@ -173,18 +176,18 @@ function addHospital(data) {
 
 function addCasesLastMonth(data) {
     addChart('chartCasesLastMonth', [
-        chartSeries(per100k(data.getMovingAverage('ZH', 'ncumul_conf', 7).slice(-30), 'ZH'), 'ZH', cantonConfig.ZH.color),
-        chartSeries(per100k(data.getMovingAverage('ZG', 'ncumul_conf', 7).slice(-30), 'ZG'), 'ZG', cantonConfig.ZG.color),
-        chartSeries(per100k(data.getMovingAverage('GR', 'ncumul_conf', 7).slice(-30), 'GR'), 'GR', cantonConfig.GR.color),
-        chartSeries(per100k(data.getMovingAverage('CH', 'ncumul_conf', 7).slice(-30), 'CH'), 'CH', cantonConfig.CH.color),
+        chartSeries(per100k(data.getMovingAverage('ZH', SERIES_CASES, 7).slice(-30), 'ZH'), 'ZH', cantonConfig.ZH.color),
+        chartSeries(per100k(data.getMovingAverage('ZG', SERIES_CASES, 7).slice(-30), 'ZG'), 'ZG', cantonConfig.ZG.color),
+        chartSeries(per100k(data.getMovingAverage('GR', SERIES_CASES, 7).slice(-30), 'GR'), 'GR', cantonConfig.GR.color),
+        chartSeries(per100k(data.getMovingAverage('CH', SERIES_CASES, 7).slice(-30), 'CH'), 'CH', cantonConfig.CH.color),
     ],
     chartOptionsSmall())
 }
 
 function addDeathsLastMonth(data) {
     addChart('chartDeathsLastMonth', [
-        chartSeries(data.getMovingAverage('ZH', 'ncumul_deceased', 7).slice(-30), 'ZH', cantonConfig.ZH.color),
-        chartSeries(data.getMovingAverage('CH', 'ncumul_deceased', 7).slice(-30), 'CH', cantonConfig.CH.color),
+        chartSeries(data.getMovingAverage('ZH', SERIES_DEATHS, 7).slice(-30), 'ZH', cantonConfig.ZH.color),
+        chartSeries(data.getMovingAverage('CH', SERIES_DEATHS, 7).slice(-30), 'CH', cantonConfig.CH.color),
     ],
     chartOptionsSmall())
 }
