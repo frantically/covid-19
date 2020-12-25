@@ -1,10 +1,13 @@
 import { CoronaStatistics, formatDate } from './data.js'
-import { CoronaStatisticsFOPH } from './foph.js'
 
 var cantonConfig = {}
 
-const SERIES_CASES = "ncumul_conf"
-const SERIES_DEATHS = "ncumul_deceased"
+const SERIES_CASES = "casesTotal"
+const SERIES_DEATHS = "deathsTotal"
+const SERIES_HOSPITALIZED = "hospitalized"
+const SERIES_ICU = "icu"
+const SERIES_VENTILATED = "ventilated"
+
 
 function formatNumber(n) {
     return new Number(n).toLocaleString('de-CH')
@@ -168,9 +171,9 @@ function addCasesPer100000(data) {
 
 function addHospital(data) {
     addChart('hospitalized', [
-            chartSeries(data.getSeries('ZH', 'current_hosp'), 'Hospitalized', [252, 191, 73]),
-            chartSeries(data.getSeries('ZH', 'current_icu'), 'ICU', [247, 127, 0]),
-            chartSeries(data.getSeries('ZH', 'current_vent'), 'Ventilated', [214, 40, 40]),
+            chartSeries(data.getSeries('ZH', SERIES_HOSPITALIZED), 'Hospitalized', [252, 191, 73]),
+            chartSeries(data.getSeries('ZH', SERIES_ICU), 'ICU', [247, 127, 0]),
+            chartSeries(data.getSeries('ZH', SERIES_VENTILATED), 'Ventilated', [214, 40, 40]),
         ],
         chartOptions())
 }
@@ -234,39 +237,16 @@ function init() {
         .then(r => r.text())
         .then(csvData => {
             var data = new CoronaStatistics(csvData)
+            outputDebug(data)
             addNumericalStats(data)
             addCasesPer100000(data)
             addDeaths(data)
             addCases(data)
             addHospital(data)
-            outputDebug(data)
             addCasesLastMonth(data)
             addDeathsLastMonth(data)
         })
 }
-
-function initFoph() {
-    
-    //applyTheme()
-    fetch('cantonConfig.json')
-        .then(r =>   r.json())
-        .then(r => cantonConfig = r)
-        .then(x => { return fetch('foph.json')})
-        .then(r => r.json())
-        .then(json => {
-            var data = new CoronaStatisticsFOPH(json)
-            addNumericalStats(data)
-            addCasesPer100000(data)
-            addDeaths(data)
-            addCases(data)
-            addHospital(data)
-            outputDebug(data)
-            addCasesLastMonth(data)
-            addDeathsLastMonth(data)
-        })
-}
-
-
 
 init()
 // initFoph()

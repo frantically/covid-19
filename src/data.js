@@ -1,6 +1,4 @@
-const SAMPLE_DATA_FIELDS_SOURCE = ["ncumul_tested" , "ncumul_conf" , "new_hosp" , "current_hosp", "current_icu" , "current_vent" , "ncumul_released" , "ncumul_deceased", "current_isolated", "current_quarantined" , "current_quarantined_riskareatravel", "current_quarantined_total" ]
-const SAMPLE_DATA_FIELDS_CARRY = ["ncumul_conf", "ncumul_deceased", "current_hosp"]
-const SAMPLE_DATA_FIELDS_ALL_NEW = SAMPLE_DATA_FIELDS_SOURCE.concat(["ncumul_conf_raw", "ncumul_deceased_raw", "raw"])
+const SAMPLE_DATA_FIELDS_ALL_NEW = ["casesTotal", "deathsTotal"]
 
 const ONE_DAY = 24 * 60 * 60 * 1000
 const MIN_START_DATE = Date.parse("2020-03-01")
@@ -17,29 +15,40 @@ export class CoronaStatistics {
         this._data = this._createDataFromCSV(csvData)
     }
 
-    _scaffoldData(source) {
-        var minMax = source.reduce((a, c) => {
-            c.raw = 1 // leverage the minMax calculation to add a new attribute to show raw values - unclear code
+    _dateRangeInData(data) {
+        var dateRange = data.reduce((a, c) => {
             a.min = Math.min(c.date, a.min)
             a.max = Math.max(c.date, a.max)
             return a
         }, {min: Number.MAX_VALUE , max: 0})
-        minMax.min = Math.max(MIN_START_DATE, minMax.min)
-
-        console.log(`Date Range in data: ${formatDate(minMax.min)} - ${formatDate(minMax.max)}`)
+        dateRange.min = Math.max(MIN_START_DATE, dateRange.min)
+        return dateRange
+    }
+    
+    _groupByLocationByDate(data) {
+        return data.reduce((a, c) => {
+            var byDate = a[c.location] || {}
+            byDate[c.date] = c
+            a[c.location] = byDate
+            return a
+        }, {})
+    }
+       
+    _scaffoldData(source) {
+        var dateRange = this._dateRangeInData(source)
+        console.log(`Date Range in data: ${formatDate(dateRange.min)} - ${formatDate(dateRange.max)}`)
         var days = []
-        for(var i = minMax.min;i<= minMax.max;i = i+ONE_DAY) {
+        for(var i = dateRange.min;i<= dateRange.max;i = i+ONE_DAY) {
             days.push(i)
         }
-        var cantons = this._getCantons(source)
-        var result = {}
-        cantons.forEach(canton => {
-            var cantonData = this._getCantonDataByDate(source, canton)
-            var cantonScaffoldedData = days.map(date => {
-                return cantonData[date] ? cantonData[date] : {date: date, abbreviation_canton_and_fl: canton, raw: 0}
+        var byLocationByDate = this._groupByLocationByDate(source)
+        var result = Object.keys(byLocationByDate).reduce((result, location) => {
+            var locationData = byLocationByDate[location]
+            result[location] = days.map(date => {
+                return locationData[date] ? locationData[date] : {date: date, location: location, scaffold: 1}
             })
-            result[canton] = cantonScaffoldedData
-        })
+            return result
+        }, {})
         this._carryForwardAccumlatedValues(result)
         result['CH'] = this._aggregateCH(result)
         return result
@@ -51,9 +60,10 @@ export class CoronaStatistics {
 
             //carry forward current value if new value not provided
             cantonData.forEach(sample => {
-                SAMPLE_DATA_FIELDS_CARRY.forEach(field => {
+                SAMPLE_DATA_FIELDS_ALL_NEW.forEach(field => {
                     sample[`${field}_raw`] = sample[field]
                     if(isNaN(sample[field])) {
+                        // console.log("carrying for key: " + sample.key)
                         sample[field] = lastValue[field] || 0
                     } else {
                         lastValue[field] = sample[field]
@@ -62,7 +72,7 @@ export class CoronaStatistics {
             })
 
             //but wipe out any extrapolation after the last value in the underlying data source
-            SAMPLE_DATA_FIELDS_CARRY.forEach(field => {
+            SAMPLE_DATA_FIELDS_ALL_NEW.forEach(field => {
                 var i = cantonData.length - 1
                 while(isNaN(cantonData[i][`${field}_raw`]) && i > 0) {
                     cantonData[i][field] = NaN
@@ -77,7 +87,7 @@ export class CoronaStatistics {
         var sampleCount = cantonsData[0].length
         var result = []
         for(var i=0;i<sampleCount;i++) {
-            var sample = {date: cantonsData[0][i].date, abbreviation_canton_and_fl: "CH" }
+            var sample = {date: cantonsData[0][i].date, location: "CH" }
             SAMPLE_DATA_FIELDS_ALL_NEW.forEach(field => {
                 var value = cantonsData
                     .map(cantonValues => cantonValues[i][field])
@@ -87,25 +97,6 @@ export class CoronaStatistics {
             result.push(sample)
         }
         return result
-    }
-
-    _getCantonDataByDate(data, canton) {
-        var result = {}
-        data
-            .filter(sample => sample.abbreviation_canton_and_fl == canton)
-            .forEach(sample => {
-                result[sample.date] = sample
-            })
-        return result
-    }
-
-    _getCantons(data) {
-        var cantons = data.reduce((a, c) => {
-            a.add(c.abbreviation_canton_and_fl)
-            return a
-        }, new Set())
-        
-        return [...cantons]
     }
 
     _convertCSVToJSON(str, delimiter = ',') {
@@ -118,16 +109,21 @@ export class CoronaStatistics {
     }
 
     _createDataFromCSV(data) {
-        var result = this._convertCSVToJSON(data)
-        result.forEach(item => {
-            item.date = Date.parse(item.date)
-            SAMPLE_DATA_FIELDS_SOURCE.forEach(field => {
-                item[field] = parseInt(item[field])
-            })
-        })
-        //console.log(result)
-        result = result.filter(sample => sample.date) // parsing the CSV gets an empty row at the end
+        var result = this._convertCSVToJSON(data).filter(sample => sample.date).map(this._extractSample)
         return this._scaffoldData(result)
+    }
+
+    _extractSample(source) {
+        return {
+            key: `${source.abbreviation_canton_and_fl}_${source.date}`,
+            location: source.abbreviation_canton_and_fl,
+            date: Date.parse(source.date),
+            casesTotal: parseInt(source.ncumul_conf),
+            deathsTotal: parseInt(source.ncumul_deceased),
+            hospitalized: parseInt(source.current_hosp),
+            icu: parseInt(source.current_icu),
+            ventilated: parseInt(source.current_vent)
+        }
     }
 
     //TODO: REMOVE THIS AS IT'S A SIGN OF OTHER METHODS MISSING LIKE getMovingAverage
@@ -153,7 +149,7 @@ export class CoronaStatistics {
     }
 
     getMaxDate(canton) {
-        return this._data[canton].filter(sample => sample.ncumul_conf).reduce((result, current) => Math.max(result, current.date), 0)
+        return this._data[canton].filter(sample => sample.casesTotal).reduce((result, current) => Math.max(result, current.date), 0)
     }
 
     getSeriesChange(canton, field, start, end = undefined) {
