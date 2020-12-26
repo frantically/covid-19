@@ -1,13 +1,6 @@
-import { CoronaStatistics, formatDate } from './data.js'
+import { CoronaStatistics, csvStringToJson, openZHExtractor, formatDate, SERIES_CASES, SERIES_DEATHS, SERIES_HOSPITALIZED, SERIES_ICU, SERIES_VENTILATED } from './data.js'
 
 var cantonConfig = {}
-
-const SERIES_CASES = "casesTotal"
-const SERIES_DEATHS = "deathsTotal"
-const SERIES_HOSPITALIZED = "hospitalized"
-const SERIES_ICU = "icu"
-const SERIES_VENTILATED = "ventilated"
-
 
 function formatNumber(n) {
     return new Number(n).toLocaleString('de-CH')
@@ -197,8 +190,8 @@ function addDeathsLastMonth(data) {
 }
 
 function outputDebug(data) {
-    // console.log(data.getData('CH'))
-    console.log(data.getSeries('ZH', SERIES_CASES))
+    console.log(data.getData('CH'))
+    // console.log(data.getSeries('ZH', SERIES_CASES))
 }
 
 function isLightTheme() {
@@ -236,7 +229,7 @@ function init() {
         .then(x => { return fetch('https://raw.githubusercontent.com/openZH/covid_19/master/COVID19_Fallzahlen_CH_total_v2.csv')})
         .then(r => r.text())
         .then(csvData => {
-            var data = new CoronaStatistics(csvData)
+            var data = new CoronaStatistics(csvStringToJson(csvData, openZHExtractor))
             outputDebug(data)
             addNumericalStats(data)
             addCasesPer100000(data)
@@ -245,6 +238,19 @@ function init() {
             addHospital(data)
             addCasesLastMonth(data)
             addDeathsLastMonth(data)
+        })
+}
+
+function initFoph() {
+    fetch('https://www.covid19.admin.ch/api/data/context')
+        .then(r => r.json())
+        .then(context => {
+            var casesUrl = context.sources.individual.csv.daily.cases
+            var deathsUrl = context.sources.individual.csv.daily.death
+            return Promise.all([fetch(casesUrl).then(r => r.text()), fetch(deathsUrl).then(r => r.text())])
+        })
+        .then(data => {
+            console.log(data)
         })
 }
 

@@ -1,5 +1,11 @@
 const SAMPLE_DATA_FIELDS_ALL_NEW = ["casesTotal", "deathsTotal"]
 
+export const SERIES_CASES = "casesTotal"
+export const SERIES_DEATHS = "deathsTotal"
+export const SERIES_HOSPITALIZED = "hospitalized"
+export const SERIES_ICU = "icu"
+export const SERIES_VENTILATED = "ventilated"
+
 const ONE_DAY = 24 * 60 * 60 * 1000
 const MIN_START_DATE = Date.parse("2020-03-01")
 
@@ -7,12 +13,40 @@ export function formatDate(d) {
     return `${new Date(d).toLocaleDateString("de-CH")}`
 }
 
+function _convertCSVToJSON(str, delimiter = ',') {
+    const titles = str.slice(0, str.indexOf('\n')).split(delimiter)
+    const rows = str.slice(str.indexOf('\n') + 1).split('\n').map(s => s.replace(/[\x00-\x1F\x7F-\x9F]/g, ""))
+    return rows.map(row => {
+        const values = row.split(delimiter)
+        return titles.reduce((object, curr, i) => (object[curr] = values[i], object), {})
+    })
+}
+
+export function csvStringToJson(data, extractor) {
+    return _convertCSVToJSON(data)
+        .filter(sample => sample.date)
+        .map(extractor)
+}
+
+export function openZHExtractor(source) {
+    return {
+        key: `${source.abbreviation_canton_and_fl}_${source.date}`,
+        location: source.abbreviation_canton_and_fl,
+        date: Date.parse(source.date),
+        casesTotal: parseInt(source.ncumul_conf),
+        deathsTotal: parseInt(source.ncumul_deceased),
+        hospitalized: parseInt(source.current_hosp),
+        icu: parseInt(source.current_icu),
+        ventilated: parseInt(source.current_vent)
+    }
+}
+
 export class CoronaStatistics {
 
     _data = {}
 
-    constructor(csvData) {
-        this._data = this._createDataFromCSV(csvData)
+    constructor(data) {
+        this._data = this._scaffoldData(data)
     }
 
     _dateRangeInData(data) {
@@ -51,6 +85,9 @@ export class CoronaStatistics {
         }, {})
         this._carryForwardAccumlatedValues(result)
         result['CH'] = this._aggregateCH(result)
+        Object.values(result).forEach(dataSet => {
+            SAMPLE_DATA_FIELDS_ALL_NEW.forEach(field => this._setPeriodTotal(dataSet, field, 7))
+        })
         return result
     }
 
@@ -99,33 +136,6 @@ export class CoronaStatistics {
         return result
     }
 
-    _convertCSVToJSON(str, delimiter = ',') {
-        const titles = str.slice(0, str.indexOf('\n')).split(delimiter)
-        const rows = str.slice(str.indexOf('\n') + 1).split('\n').map(s => s.replace(/[\x00-\x1F\x7F-\x9F]/g, ""))
-        return rows.map(row => {
-            const values = row.split(delimiter)
-            return titles.reduce((object, curr, i) => (object[curr] = values[i], object), {})
-        })
-    }
-
-    _createDataFromCSV(data) {
-        var result = this._convertCSVToJSON(data).filter(sample => sample.date).map(this._extractSample)
-        return this._scaffoldData(result)
-    }
-
-    _extractSample(source) {
-        return {
-            key: `${source.abbreviation_canton_and_fl}_${source.date}`,
-            location: source.abbreviation_canton_and_fl,
-            date: Date.parse(source.date),
-            casesTotal: parseInt(source.ncumul_conf),
-            deathsTotal: parseInt(source.ncumul_deceased),
-            hospitalized: parseInt(source.current_hosp),
-            icu: parseInt(source.current_icu),
-            ventilated: parseInt(source.current_vent)
-        }
-    }
-
     //TODO: REMOVE THIS AS IT'S A SIGN OF OTHER METHODS MISSING LIKE getMovingAverage
     getData(canton) {
         return this._data[canton]
@@ -137,12 +147,14 @@ export class CoronaStatistics {
     }
 
     getMovingAverage(canton, accumulativeField, days) {
-        var data = this._data[canton]
+        return this.getSeries(canton, `${accumulativeField}${days}d`).map(p => { return {x: p.x, y: Math.round(p.y/days)}})
+    }
+
+    _setPeriodTotal(data, accumulativeField, days) {
         var result = []
         if(data) {
-            for(var i = days -1 ;i<data.length;i++) {
-                var point = {x: data[i].date, y: Math.round((data[i][accumulativeField]-data[i-days+1][accumulativeField])/days)}
-                result.push(point)
+            for(var i = days ;i<data.length;i++) {
+                data[i][`${accumulativeField}${days}d`] = data[i][accumulativeField]-data[i-days][accumulativeField]
             }
         }
         return result
@@ -152,7 +164,7 @@ export class CoronaStatistics {
         return this._data[canton].filter(sample => sample.casesTotal).reduce((result, current) => Math.max(result, current.date), 0)
     }
 
-    getSeriesChange(canton, field, start, end = undefined) {
+    _getSeriesChange(canton, field, start, end = undefined) {
         var cantonData = this._data[canton]
         var slice = cantonData.map(d => d[field]).filter(s => s).slice(start, end)
         return slice[slice.length-1] - slice[0]
@@ -163,10 +175,10 @@ export class CoronaStatistics {
     }
     
     getLastWeek(canton, field) {
-        return this.getSeriesChange(canton, field, -7)
+        return this._getSeriesChange(canton, field, -8)
     }
 
     getPriorWeek(canton, field) {
-        return this.getSeriesChange(canton, field, -14, -7)
+        return this._getSeriesChange(canton, field, -15, -7)
     }
 }
