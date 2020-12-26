@@ -14,10 +14,10 @@ export function formatDate(d) {
 }
 
 function _convertCSVToJSON(str, delimiter = ',') {
-    const titles = str.slice(0, str.indexOf('\n')).split(delimiter)
+    const titles = str.slice(0, str.indexOf('\n')).split(delimiter).map(s => s.startsWith("\"") && s.endsWith("\"") ? s.slice(1, -1) : s)
     const rows = str.slice(str.indexOf('\n') + 1).split('\n').map(s => s.replace(/[\x00-\x1F\x7F-\x9F]/g, ""))
     return rows.map(row => {
-        const values = row.split(delimiter)
+        const values = row.split(delimiter).map(s => s.startsWith("\"") && s.endsWith("\"") ? s.slice(1, -1) : s)
         return titles.reduce((object, curr, i) => (object[curr] = values[i], object), {})
     })
 }

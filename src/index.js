@@ -189,9 +189,26 @@ function addDeathsLastMonth(data) {
     chartOptionsSmall())
 }
 
+function addRe(sourceData) {
+    console.log(sourceData)
+    var data = csvStringToJson(sourceData, fophExtractor).filter(sample => sample.re)
+    console.log(data)
+    var zh = data.filter(d => d.location === "ZH").map(sample => {return {x: sample.date, y: sample.re}})
+    var zg = data.filter(d => d.location === "ZG").map(sample => {return {x: sample.date, y: sample.re}})
+    var gr = data.filter(d => d.location === "GR").map(sample => {return {x: sample.date, y: sample.re}})
+    var ch = data.filter(d => d.location === "CH").map(sample => {return {x: sample.date, y: sample.re}})
+    console.log(zh)
+    addChart('chartRe', [
+            chartSeries(zh, 'ZH', cantonConfig.ZH.color),
+            chartSeries(zg, 'ZG', cantonConfig.ZG.color),
+            chartSeries(gr, 'GR', cantonConfig.GR.color),
+            chartSeries(ch, 'CH', cantonConfig.CH.color),
+        ],
+        chartOptions())
+}
+
 function outputDebug(data) {
     console.log(data.getData('CH'))
-    // console.log(data.getSeries('ZH', SERIES_CASES))
 }
 
 function isLightTheme() {
@@ -235,7 +252,7 @@ function init() {
             addCasesPer100000(data)
             addDeaths(data)
             addCases(data)
-            addHospital(data)
+            // addHospital(data)
             addCasesLastMonth(data)
             addDeathsLastMonth(data)
         })
@@ -244,15 +261,18 @@ function init() {
 function initFoph() {
     fetch('https://www.covid19.admin.ch/api/data/context')
         .then(r => r.json())
-        .then(context => {
-            var casesUrl = context.sources.individual.csv.daily.cases
-            var deathsUrl = context.sources.individual.csv.daily.death
-            return Promise.all([fetch(casesUrl).then(r => r.text()), fetch(deathsUrl).then(r => r.text())])
-        })
-        .then(data => {
-            console.log(data)
-        })
+        .then(context => fetch(context.sources.individual.csv.daily.re).then(r => r.text()))
+        .then(data => addRe(data))
+}
+
+function fophExtractor(source) {
+    return {
+        key: `${source.geoRegion}_${source.date}`,
+        location: source.geoRegion,
+        date: Date.parse(source.date),
+        re: parseFloat(source.median_R_mean)
+    }
 }
 
 init()
-// initFoph()
+initFoph()
