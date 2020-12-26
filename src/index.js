@@ -256,6 +256,7 @@ function init() {
             addCasesLastMonth(data)
             addDeathsLastMonth(data)
         })
+        .then(initFoph()) //need to know the canton config is loaded. perhaps put this in a module?
 }
 
 function initFoph() {
@@ -275,4 +276,3 @@ function fophExtractor(source) {
 }
 
 init()
-initFoph()
