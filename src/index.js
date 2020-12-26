@@ -197,10 +197,8 @@ function addRe(sourceData) {
     var ch = data.filter(d => d.location === "CH").map(sample => {return {x: sample.date, y: sample.re}}).slice(-30)
 
     var chartOptions = chartOptionsSmall()
-    //NEEDS WORK - MAY HAVE TO GO THROUGH SERIES OF DATA AND HARD CODE TO STOP suggestedMax being too lenient
-    chartOptions.scales.yAxes[0].ticks.suggestedMax = 1.2
-    chartOptions.scales.yAxes[0].ticks.min = 0.8
-    // chartOptions.scales.yAxes[0].ticks.stepSize = 0.2
+    chartOptions.scales.yAxes[0].ticks.suggestedMax = 1.1
+    chartOptions.scales.yAxes[0].ticks.suggestedMin = 0.9
 
     addChart('chartRe', [
             chartSeries(zh, 'ZH', cantonConfig.ZH.color),
