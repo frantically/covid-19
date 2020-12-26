@@ -190,14 +190,11 @@ function addDeathsLastMonth(data) {
 }
 
 function addRe(sourceData) {
-    console.log(sourceData)
     var data = csvStringToJson(sourceData, fophExtractor).filter(sample => sample.re)
-    console.log(data)
     var zh = data.filter(d => d.location === "ZH").map(sample => {return {x: sample.date, y: sample.re}})
     var zg = data.filter(d => d.location === "ZG").map(sample => {return {x: sample.date, y: sample.re}})
     var gr = data.filter(d => d.location === "GR").map(sample => {return {x: sample.date, y: sample.re}})
     var ch = data.filter(d => d.location === "CH").map(sample => {return {x: sample.date, y: sample.re}})
-    console.log(zh)
     addChart('chartRe', [
             chartSeries(zh, 'ZH', cantonConfig.ZH.color),
             chartSeries(zg, 'ZG', cantonConfig.ZG.color),
