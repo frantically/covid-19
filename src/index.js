@@ -82,10 +82,10 @@ function chartOptionsSmall() {
                 type: 'time',
             }],
             yAxes: [{
-                display: false,
+                display: true,
                 type: 'linear',
                 ticks: {
-                    beginAtZero: true,
+                    maxTicksLimit: 3
                 },
             }]
         },
@@ -191,17 +191,24 @@ function addDeathsLastMonth(data) {
 
 function addRe(sourceData) {
     var data = csvStringToJson(sourceData, fophExtractor).filter(sample => sample.re)
-    var zh = data.filter(d => d.location === "ZH").map(sample => {return {x: sample.date, y: sample.re}})
-    var zg = data.filter(d => d.location === "ZG").map(sample => {return {x: sample.date, y: sample.re}})
-    var gr = data.filter(d => d.location === "GR").map(sample => {return {x: sample.date, y: sample.re}})
-    var ch = data.filter(d => d.location === "CH").map(sample => {return {x: sample.date, y: sample.re}})
+    var zh = data.filter(d => d.location === "ZH").map(sample => {return {x: sample.date, y: sample.re}}).slice(-30)
+    var zg = data.filter(d => d.location === "ZG").map(sample => {return {x: sample.date, y: sample.re}}).slice(-30)
+    var gr = data.filter(d => d.location === "GR").map(sample => {return {x: sample.date, y: sample.re}}).slice(-30)
+    var ch = data.filter(d => d.location === "CH").map(sample => {return {x: sample.date, y: sample.re}}).slice(-30)
+
+    var chartOptions = chartOptionsSmall()
+    //NEEDS WORK - MAY HAVE TO GO THROUGH SERIES OF DATA AND HARD CODE TO STOP suggestedMax being too lenient
+    chartOptions.scales.yAxes[0].ticks.suggestedMax = 1.2
+    chartOptions.scales.yAxes[0].ticks.min = 0.8
+    // chartOptions.scales.yAxes[0].ticks.stepSize = 0.2
+
     addChart('chartRe', [
             chartSeries(zh, 'ZH', cantonConfig.ZH.color),
             chartSeries(zg, 'ZG', cantonConfig.ZG.color),
             chartSeries(gr, 'GR', cantonConfig.GR.color),
             chartSeries(ch, 'CH', cantonConfig.CH.color),
         ],
-        chartOptions())
+        chartOptions)
 }
 
 function outputDebug(data) {
@@ -249,11 +256,11 @@ function init() {
             addCasesPer100000(data)
             addDeaths(data)
             addCases(data)
-            // addHospital(data)
+            addHospital(data)
             addCasesLastMonth(data)
-            addDeathsLastMonth(data)
+            // addDeathsLastMonth(data)
         })
-        .then(initFoph()) //need to know the canton config is loaded. perhaps put this in a module?
+        .then(x => initFoph()) //need to know the canton config is loaded. perhaps put this in a module?
 }
 
 function initFoph() {
