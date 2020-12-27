@@ -238,14 +238,14 @@ function applyTheme() {
     }
 }
 
-function init() {
-    
-    //applyTheme()
-    fetch('cantonConfig.json')
+function loadCantonConfig() {
+    return fetch('cantonConfig.json')
         .then(r =>   r.json())
         .then(r => cantonConfig = r)
-        // .then(x => { return fetch('unittest.csv')})
-        .then(x => { return fetch('https://raw.githubusercontent.com/openZH/covid_19/master/COVID19_Fallzahlen_CH_total_v2.csv')})
+}
+
+function initOpenZH() {
+    fetch('https://raw.githubusercontent.com/openZH/covid_19/master/COVID19_Fallzahlen_CH_total_v2.csv')
         .then(r => r.text())
         .then(csvData => {
             var data = new CoronaStatistics(csvStringToJson(csvData).map(openZHConverter))
@@ -258,14 +258,27 @@ function init() {
             addCasesLastMonth(data)
             // addDeathsLastMonth(data)
         })
-        .then(x => initFoph()) //need to know the canton config is loaded. perhaps put this in a module?
 }
 
-function initFoph() {
+function initFOPH() {
     fetch('https://www.covid19.admin.ch/api/data/context')
         .then(r => r.json())
-        .then(context => fetch(context.sources.individual.csv.daily.re).then(r => r.text()))
+        .then(context => initFOPH_Re(context))
+}
+
+function initFOPH_Re(context) {
+    fetch(context.sources.individual.csv.daily.re)
+        .then(r => r.text())
         .then(data => addRe(data))
+}
+
+function init() {
+    //applyTheme()
+    loadCantonConfig()
+        .then(() => {
+            initOpenZH()
+            initFOPH()
+        })
 }
 
 function fophConverter(source) {
