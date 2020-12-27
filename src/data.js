@@ -22,23 +22,9 @@ function _convertCSVToJSON(str, delimiter = ',') {
     })
 }
 
-export function csvStringToJson(data, extractor) {
+export function csvStringToJson(data) {
     return _convertCSVToJSON(data)
         .filter(sample => sample.date)
-        .map(extractor)
-}
-
-export function openZHExtractor(source) {
-    return {
-        key: `${source.abbreviation_canton_and_fl}_${source.date}`,
-        location: source.abbreviation_canton_and_fl,
-        date: Date.parse(source.date),
-        casesTotal: parseInt(source.ncumul_conf),
-        deathsTotal: parseInt(source.ncumul_deceased),
-        hospitalized: parseInt(source.current_hosp),
-        icu: parseInt(source.current_icu),
-        ventilated: parseInt(source.current_vent)
-    }
 }
 
 export class CoronaStatistics {

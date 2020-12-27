@@ -1,4 +1,4 @@
-import { CoronaStatistics, csvStringToJson, openZHExtractor, formatDate, SERIES_CASES, SERIES_DEATHS, SERIES_HOSPITALIZED, SERIES_ICU, SERIES_VENTILATED } from './data.js'
+import { CoronaStatistics, csvStringToJson, formatDate, SERIES_CASES, SERIES_DEATHS, SERIES_HOSPITALIZED, SERIES_ICU, SERIES_VENTILATED } from './data.js'
 
 var cantonConfig = {}
 
@@ -190,7 +190,7 @@ function addDeathsLastMonth(data) {
 }
 
 function addRe(sourceData) {
-    var data = csvStringToJson(sourceData, fophExtractor).filter(sample => sample.re)
+    var data = csvStringToJson(sourceData).map(fophConverter).filter(sample => sample.re)
     var zh = data.filter(d => d.location === "ZH").map(sample => {return {x: sample.date, y: sample.re}}).slice(-30)
     var zg = data.filter(d => d.location === "ZG").map(sample => {return {x: sample.date, y: sample.re}}).slice(-30)
     var gr = data.filter(d => d.location === "GR").map(sample => {return {x: sample.date, y: sample.re}}).slice(-30)
@@ -248,7 +248,7 @@ function init() {
         .then(x => { return fetch('https://raw.githubusercontent.com/openZH/covid_19/master/COVID19_Fallzahlen_CH_total_v2.csv')})
         .then(r => r.text())
         .then(csvData => {
-            var data = new CoronaStatistics(csvStringToJson(csvData, openZHExtractor))
+            var data = new CoronaStatistics(csvStringToJson(csvData).map(openZHConverter))
             outputDebug(data)
             addNumericalStats(data)
             addCasesPer100000(data)
@@ -268,12 +268,25 @@ function initFoph() {
         .then(data => addRe(data))
 }
 
-function fophExtractor(source) {
+function fophConverter(source) {
     return {
         key: `${source.geoRegion}_${source.date}`,
         location: source.geoRegion,
         date: Date.parse(source.date),
         re: parseFloat(source.median_R_mean)
+    }
+}
+
+function openZHConverter(source) {
+    return {
+        key: `${source.abbreviation_canton_and_fl}_${source.date}`,
+        location: source.abbreviation_canton_and_fl,
+        date: Date.parse(source.date),
+        casesTotal: parseInt(source.ncumul_conf),
+        deathsTotal: parseInt(source.ncumul_deceased),
+        hospitalized: parseInt(source.current_hosp),
+        icu: parseInt(source.current_icu),
+        ventilated: parseInt(source.current_vent)
     }
 }
 
