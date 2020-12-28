@@ -2,19 +2,19 @@
   "name": "covid19",
   "version": "1.0.0",
   "description": "COVID-19 Switzerland Data & Charts",
-  "main": "app.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/frantically/covid19.git"
   },
   "dependencies": {},
   "devDependencies": {
-    "express": "^4.17.1",
+    "http-server": "^0.12.3",
     "@babel/preset-env": "^7.12.1",
     "babel-jest": "^26.6.3",
     "jest": "^26.6.3"
   },
   "scripts": {
+    "serve": "http-server -p 3001 src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Tim Parker",
