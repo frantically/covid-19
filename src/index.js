@@ -211,7 +211,7 @@ function initOpenZH() {
     fetch('https://raw.githubusercontent.com/openZH/covid_19/master/COVID19_Fallzahlen_CH_total_v2.csv')
         .then(r => r.text())
         .then(csvData => {
-            var data = new CoronaStatistics(csvStringToJson(csvData).map(openZHConverter).filter(s => s.date))
+            var data = new CoronaStatistics(csvStringToJson(csvData))
             outputDebug(data)
             addHospital(data)
         })

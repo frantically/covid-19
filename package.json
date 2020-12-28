@@ -14,7 +14,7 @@
     "jest": "^26.6.3"
   },
   "scripts": {
-    "serve": "http-server -p 3001 src",
+    "serve": "http-server -c-1 -p 3001 src",
     "test": "jest"
   },
   "author": "Tim Parker",
