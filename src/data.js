@@ -15,9 +15,24 @@ export class CoronaStatistics {
 
     _data = {}
 
-    constructor(data) {
+    constructor(sourceData) {
+        var data = sourceData.map(this._openZHConverter).filter(s => s.date) //filter out last empty row in data
         this._data = this._scaffoldData(data)
     }
+
+    _openZHConverter(source) {
+        return {
+            key: `${source.abbreviation_canton_and_fl}_${source.date}`,
+            location: source.abbreviation_canton_and_fl,
+            date: Date.parse(source.date),
+            casesTotal: parseInt(source.ncumul_conf),
+            deathsTotal: parseInt(source.ncumul_deceased),
+            hospitalized: parseInt(source.current_hosp),
+            icu: parseInt(source.current_icu),
+            ventilated: parseInt(source.current_vent)
+        }
+    }
+    
 
     _dateRangeInData(data) {
         var dateRange = data.reduce((a, c) => {

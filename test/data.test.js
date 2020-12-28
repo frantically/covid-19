@@ -1,9 +1,11 @@
 const fs = require('fs')
-const { CoronaStatistics, csvStringToJson, openZHExtractor } = require("../src/data.js");
+const { CoronaStatistics, openZHExtractor } = require("../src/data.js");
+const { csvStringToJson } = require("../src/utils.js");
+
 
 function loadTestData(file = 'test/unittest.csv') {
     var csv = fs.readFileSync(file).toString()
-    return new CoronaStatistics(csvStringToJson(csv, openZHExtractor))
+    return new CoronaStatistics(csvStringToJson(csv))
 }
 
 test("Scaffolded data should be 10 long", () => {

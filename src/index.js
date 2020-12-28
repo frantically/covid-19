@@ -1,4 +1,4 @@
-import { CoronaStatistics, SERIES_CASES, SERIES_DEATHS, SERIES_HOSPITALIZED, SERIES_ICU, SERIES_VENTILATED } from './data.js'
+import { CoronaStatistics, SERIES_HOSPITALIZED, SERIES_ICU, SERIES_VENTILATED } from './data.js'
 import { FOPHCoronaStatistics } from './foph.js'
 import { csvStringToJson, formatDate, formatNumber } from './utils.js'
 
@@ -247,19 +247,6 @@ function init() {
             initOpenZH()
             initFOPH()
         })
-}
-
-function openZHConverter(source) {
-    return {
-        key: `${source.abbreviation_canton_and_fl}_${source.date}`,
-        location: source.abbreviation_canton_and_fl,
-        date: Date.parse(source.date),
-        casesTotal: parseInt(source.ncumul_conf),
-        deathsTotal: parseInt(source.ncumul_deceased),
-        hospitalized: parseInt(source.current_hosp),
-        icu: parseInt(source.current_icu),
-        ventilated: parseInt(source.current_vent)
-    }
 }
 
 init()

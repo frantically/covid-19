@@ -15,7 +15,7 @@
   },
   "scripts": {
     "serve": "http-server -p 3001 src",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "Tim Parker",
   "license": "ISC"
