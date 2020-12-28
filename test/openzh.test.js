@@ -1,5 +1,5 @@
 const fs = require('fs')
-const { CoronaStatistics, openZHExtractor } = require("../src/data.js");
+const { CoronaStatistics, openZHExtractor } = require("../src/openzh.js");
 const { csvStringToJson } = require("../src/utils.js");
 
 

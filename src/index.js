@@ -1,4 +1,4 @@
-import { CoronaStatistics, SERIES_HOSPITALIZED, SERIES_ICU, SERIES_VENTILATED } from './data.js'
+import { CoronaStatistics, SERIES_HOSPITALIZED, SERIES_ICU, SERIES_VENTILATED } from './openzh.js'
 import { FOPHCoronaStatistics } from './foph.js'
 import { csvStringToJson, formatDate, formatNumber } from './utils.js'
 
