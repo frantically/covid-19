@@ -1,10 +1,11 @@
-import { CoronaStatistics, csvStringToJson, formatDate, SERIES_CASES, SERIES_DEATHS, SERIES_HOSPITALIZED, SERIES_ICU, SERIES_VENTILATED } from './data.js'
+import { CoronaStatistics, SERIES_CASES, SERIES_DEATHS, SERIES_HOSPITALIZED, SERIES_ICU, SERIES_VENTILATED } from './data.js'
+import { FOPHCoronaStatistics } from './foph.js'
+import { csvStringToJson, formatDate, formatNumber } from './utils.js'
 
 var cantonConfig = {}
 
-function formatNumber(n) {
-    return new Number(n).toLocaleString('de-CH')
-}
+//TOOD: WHY ARE DEATHS LOWER, IS THIS CORRECT?
+//TODO: SHOULD I COMBINE DATA FOR FOPH INTO A SINGLE CSV AND ACCESS BY SERIES TYPE AS PER OpenZH?
 
 function chartSeries(data, label, rgb, alpha = 1) {
     var result = {
@@ -19,6 +20,10 @@ function chartSeries(data, label, rgb, alpha = 1) {
         borderWidth: 2,
     }
     return result
+}
+
+function cantonChartSeries(data, canton) {
+    return chartSeries(data, canton, cantonConfig[canton].color)
 }
 
 function chartOptions(xAxisUnit = 'month') {
@@ -98,28 +103,6 @@ function chartOptionsSmall() {
     }
 }
 
-function addNumericalStats(data) {
-
-    var lastWeek = data.getLastWeek('CH', SERIES_CASES)
-    var priorWeek = data.getPriorWeek('CH', SERIES_CASES)
-    var casesMovePercentage = Math.round(((lastWeek-priorWeek)/priorWeek)*100)
-
-    var lastWeekDeceased = data.getLastWeek('CH', SERIES_DEATHS)
-    var priorWeekDeceased = data.getPriorWeek('CH', SERIES_DEATHS)
-    var deathsMovePercentage = Math.round(((lastWeekDeceased-priorWeekDeceased)/priorWeekDeceased)*100)
-
-    var ncumul_conf = data.getLastValue('CH', SERIES_CASES)
-    var ncumul_deceased = data.getLastValue('CH', SERIES_DEATHS)
-
-    var maxDate = data.getMaxDate('CH')
-
-    document.getElementById("totalConfirmed").innerHTML = formatNumber(ncumul_conf);
-    document.getElementById("last7Days").innerHTML = `<span class="${lastWeek > priorWeek ? "down" : "up"}">${formatNumber(lastWeek)} <span class="highlightChange">${casesMovePercentage}%</span></span>`
-    document.getElementById("totalDeaths").innerHTML = formatNumber(ncumul_deceased)
-    document.getElementById("last7Deaths").innerHTML = `<span class="${lastWeekDeceased > priorWeekDeceased ? "down" : "up"}">${formatNumber(lastWeekDeceased)} <span class="highlightChange">${deathsMovePercentage}%</span></span>`
-    document.getElementById("maxDate").innerHTML = `CH Latest: ${formatDate(maxDate)}`
-}
-
 function addChart(element, dataSeries, options) {
     var ctx = document.getElementById(element);
 
@@ -132,34 +115,12 @@ function addChart(element, dataSeries, options) {
     });
 }
 
-function per100k(series, canton) {
-    return series.map(point => { return {x: point.x, y: point.y/(cantonConfig[canton].population/100000)}})
+function addNumber(element, number) {
+    document.getElementById(element).innerHTML = formatNumber(number)
 }
 
-function addCases(data) {
-    addChart('cases', [ 
-            chartSeries(data.getSeries('ZH', SERIES_CASES), "ZH", cantonConfig.ZH.color, 1),
-            chartSeries(data.getSeries('CH', SERIES_CASES), "CH", cantonConfig.CH.color, 1),
-        ],
-        chartOptions())
-}
-
-function addDeaths(data) {
-    addChart('deaths', [ 
-            chartSeries(data.getMovingAverage('ZH', SERIES_DEATHS, 7), 'ZH', cantonConfig.ZH.color),
-            chartSeries(data.getMovingAverage('CH', SERIES_DEATHS, 7), 'CH', cantonConfig.CH.color),
-        ],
-        chartOptions())
-}
-
-function addCasesPer100000(data) {
-    addChart('casesPer100000', [
-            chartSeries(per100k(data.getMovingAverage('ZH', SERIES_CASES, 7), 'ZH'), 'ZH', cantonConfig.ZH.color),
-            chartSeries(per100k(data.getMovingAverage('ZG', SERIES_CASES, 7), 'ZG'), 'ZG', cantonConfig.ZG.color),
-            chartSeries(per100k(data.getMovingAverage('GR', SERIES_CASES, 7), 'GR'), 'GR', cantonConfig.GR.color),
-            chartSeries(per100k(data.getMovingAverage('CH', SERIES_CASES, 7), 'CH'), 'CH', cantonConfig.CH.color),
-        ],
-        chartOptions())
+function addNumberAndPercentMove(element, number, percentMove){
+    document.getElementById(element).innerHTML = `<span class="${percentMove > 0 ? "down" : "up"}">${formatNumber(number)} <span class="highlightChange">${Math.round(percentMove)}%</span></span>`
 }
 
 function addHospital(data) {
@@ -171,71 +132,73 @@ function addHospital(data) {
         chartOptions())
 }
 
-function addCasesLastMonth(data) {
-    addChart('chartCasesLastMonth', [
-        chartSeries(per100k(data.getMovingAverage('ZH', SERIES_CASES, 7).slice(-30), 'ZH'), 'ZH', cantonConfig.ZH.color),
-        chartSeries(per100k(data.getMovingAverage('ZG', SERIES_CASES, 7).slice(-30), 'ZG'), 'ZG', cantonConfig.ZG.color),
-        chartSeries(per100k(data.getMovingAverage('GR', SERIES_CASES, 7).slice(-30), 'GR'), 'GR', cantonConfig.GR.color),
-        chartSeries(per100k(data.getMovingAverage('CH', SERIES_CASES, 7).slice(-30), 'CH'), 'CH', cantonConfig.CH.color),
-    ],
-    chartOptionsSmall())
-}
-
-function addDeathsLastMonth(data) {
-    addChart('chartDeathsLastMonth', [
-        chartSeries(data.getMovingAverage('ZH', SERIES_DEATHS, 7).slice(-30), 'ZH', cantonConfig.ZH.color),
-        chartSeries(data.getMovingAverage('CH', SERIES_DEATHS, 7).slice(-30), 'CH', cantonConfig.CH.color),
-    ],
-    chartOptionsSmall())
-}
-
-function addRe(sourceData) {
-    var data = csvStringToJson(sourceData).map(fophConverter).filter(sample => sample.re)
-    var zh = data.filter(d => d.location === "ZH").map(sample => {return {x: sample.date, y: sample.re}}).slice(-30)
-    var zg = data.filter(d => d.location === "ZG").map(sample => {return {x: sample.date, y: sample.re}}).slice(-30)
-    var gr = data.filter(d => d.location === "GR").map(sample => {return {x: sample.date, y: sample.re}}).slice(-30)
-    var ch = data.filter(d => d.location === "CH").map(sample => {return {x: sample.date, y: sample.re}}).slice(-30)
-
-    var chartOptions = chartOptionsSmall()
-    chartOptions.scales.yAxes[0].ticks.suggestedMax = 1.1
-    chartOptions.scales.yAxes[0].ticks.suggestedMin = 0.9
-
+function addRe(data) {
     addChart('chartRe', [
-            chartSeries(zh, 'ZH', cantonConfig.ZH.color),
-            chartSeries(zg, 'ZG', cantonConfig.ZG.color),
-            chartSeries(gr, 'GR', cantonConfig.GR.color),
-            chartSeries(ch, 'CH', cantonConfig.CH.color),
+            cantonChartSeries(data.getReDataSeries("ZH").slice(-30), 'ZH'),
+            cantonChartSeries(data.getReDataSeries("ZG").slice(-30), 'ZG'),
+            cantonChartSeries(data.getReDataSeries("GR").slice(-30), 'GR'),
+            cantonChartSeries(data.getReDataSeries("CH").slice(-30), 'CH'),
         ],
-        chartOptions)
+        chartOptionsSmall())
+}
+
+function addFOPHDeaths(data) {
+    var chTotal = data.getTotalDataSeries("CH")
+    addNumber("totalDeaths", chTotal[chTotal.length - 1].y)
+
+    var lastWeek = data.getLastWeekTotal("CH")
+    var weekOnWeek = data.getLastWeekOnWeekPercentage("CH")
+    addNumberAndPercentMove("last7Deaths", lastWeek, weekOnWeek)
+
+    addChart('deaths', [
+            cantonChartSeries(data.get7DayAverageDataSeries("ZH"), 'ZH'),
+            cantonChartSeries(data.get7DayAverageDataSeries("CH"), 'CH'),
+        ],
+        chartOptions())
+}
+
+function addFOPHCases(data) {
+
+    var zhTotal = data.getTotalDataSeries("ZH")
+    var chTotal = data.getTotalDataSeries("CH")
+
+    addNumber("totalConfirmed", chTotal[chTotal.length - 1].y)
+    document.getElementById("maxDate").innerHTML = `CH Latest: ${formatDate(data.getMaxDate("CH"))}`
+
+    var lastWeek = data.getLastWeekTotal("CH")
+    var weekOnWeek = data.getLastWeekOnWeekPercentage("CH")
+    addNumberAndPercentMove("last7Days", lastWeek, weekOnWeek)
+
+    addChart('cases', [
+        cantonChartSeries(zhTotal, 'ZH'),
+        cantonChartSeries(chTotal, 'CH'),
+        ],
+        chartOptions())
+
+    var zh = data.getCasesPer100kDataSeries("ZH")
+    var zg = data.getCasesPer100kDataSeries("ZG")
+    var gr = data.getCasesPer100kDataSeries("GR")
+    var ch = data.getCasesPer100kDataSeries("CH")
+
+    addChart('casesPer100000', [
+        cantonChartSeries(zh, 'ZH'),
+        cantonChartSeries(zg, 'ZG'),
+        cantonChartSeries(gr, 'GR'),
+        cantonChartSeries(ch, 'CH'),
+        ],
+        chartOptions())
+
+    addChart('chartCasesLastMonth', [
+        cantonChartSeries(zh.slice(-30), 'ZH'),
+        cantonChartSeries(zg.slice(-30), 'ZG'),
+        cantonChartSeries(gr.slice(-30), 'GR'),
+        cantonChartSeries(ch.slice(-30), 'CH'),
+        ],
+        chartOptionsSmall())
 }
 
 function outputDebug(data) {
     console.log(data.getData('CH'))
-}
-
-function isLightTheme() {
-    var url = new URL(location.href);
-    var themeOverride = url.searchParams.get("theme");
-    var light = true
-    if(themeOverride) {
-        if(themeOverride === "dark") {
-            light = false
-        }
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        light = false
-    }
-    return light
-}
-
-function applyTheme() {
-    var element = document.body;
-    if (isLightTheme()) {
-        element.classList.add("light");
-        element.classList.remove("dark");
-    } else {
-        element.classList.remove("light");
-        element.classList.add("dark");
-    }
 }
 
 function loadCantonConfig() {
@@ -248,46 +211,42 @@ function initOpenZH() {
     fetch('https://raw.githubusercontent.com/openZH/covid_19/master/COVID19_Fallzahlen_CH_total_v2.csv')
         .then(r => r.text())
         .then(csvData => {
-            var data = new CoronaStatistics(csvStringToJson(csvData).map(openZHConverter))
+            var data = new CoronaStatistics(csvStringToJson(csvData).map(openZHConverter).filter(s => s.date))
             outputDebug(data)
-            addNumericalStats(data)
-            addCasesPer100000(data)
-            addDeaths(data)
-            addCases(data)
             addHospital(data)
-            addCasesLastMonth(data)
-            // addDeathsLastMonth(data)
         })
+}
+
+function loadFOPHData(url, callback) {
+    return fetch(url)
+        .then(r => r.text())
+        .then(str => csvStringToJson(str))
+        .then(data => new FOPHCoronaStatistics(data, cantonConfig))
 }
 
 function initFOPH() {
     fetch('https://www.covid19.admin.ch/api/data/context')
         .then(r => r.json())
-        .then(context => initFOPH_Re(context))
-}
-
-function initFOPH_Re(context) {
-    fetch(context.sources.individual.csv.daily.re)
-        .then(r => r.text())
-        .then(data => addRe(data))
+        .then(context => 
+            { return Promise.all([
+                loadFOPHData(context.sources.individual.csv.daily.re),
+                loadFOPHData(context.sources.individual.csv.daily.death),
+                loadFOPHData(context.sources.individual.csv.daily.cases)
+            ])}
+        )
+        .then(data => {
+            addRe(data[0])
+            addFOPHDeaths(data[1])
+            addFOPHCases(data[2])
+        })
 }
 
 function init() {
-    //applyTheme()
     loadCantonConfig()
         .then(() => {
             initOpenZH()
             initFOPH()
         })
-}
-
-function fophConverter(source) {
-    return {
-        key: `${source.geoRegion}_${source.date}`,
-        location: source.geoRegion,
-        date: Date.parse(source.date),
-        re: parseFloat(source.median_R_mean)
-    }
 }
 
 function openZHConverter(source) {

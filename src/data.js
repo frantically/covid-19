@@ -1,3 +1,5 @@
+import { formatDate } from './utils.js'
+
 const SAMPLE_DATA_FIELDS_ALL_NEW = ["casesTotal", "deathsTotal"]
 
 export const SERIES_CASES = "casesTotal"
@@ -8,24 +10,6 @@ export const SERIES_VENTILATED = "ventilated"
 
 const ONE_DAY = 24 * 60 * 60 * 1000
 const MIN_START_DATE = Date.parse("2020-03-01")
-
-export function formatDate(d) {
-    return `${new Date(d).toLocaleDateString("de-CH")}`
-}
-
-function _convertCSVToJSON(str, delimiter = ',') {
-    const titles = str.slice(0, str.indexOf('\n')).split(delimiter).map(s => s.startsWith("\"") && s.endsWith("\"") ? s.slice(1, -1) : s)
-    const rows = str.slice(str.indexOf('\n') + 1).split('\n').map(s => s.replace(/[\x00-\x1F\x7F-\x9F]/g, ""))
-    return rows.map(row => {
-        const values = row.split(delimiter).map(s => s.startsWith("\"") && s.endsWith("\"") ? s.slice(1, -1) : s)
-        return titles.reduce((object, curr, i) => (object[curr] = values[i], object), {})
-    })
-}
-
-export function csvStringToJson(data) {
-    return _convertCSVToJSON(data)
-        .filter(sample => sample.date)
-}
 
 export class CoronaStatistics {
 
