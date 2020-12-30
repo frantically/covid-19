@@ -133,13 +133,27 @@ function addHospital(data) {
 }
 
 function addRe(data) {
+
+
+    var zh = data.getReDataSeries("ZH").slice(-30)
+    var zg = data.getReDataSeries("ZG").slice(-30)
+    var gr = data.getReDataSeries("GR").slice(-30)
+    var ch = data.getReDataSeries("CH").slice(-30)
+
+    //TODO: Is there a neater way to set a narrow yAxis range? suggestedMax/Min create a chart with a much wider range, even if the stepSize is 0.1
+    var all = [zh, zg, gr, ch].flat().map(s => s.y)
+    var chartOptions = chartOptionsSmall()
+    chartOptions.scales.yAxes[0].ticks.stepSize = 0.1
+    chartOptions.scales.yAxes[0].ticks.min = Math.floor(Math.min(...all)*10)/10
+    chartOptions.scales.yAxes[0].ticks.max = Math.ceil(Math.max(...all)*10)/10
+
     addChart('chartRe', [
-            cantonChartSeries(data.getReDataSeries("ZH").slice(-30), 'ZH'),
-            cantonChartSeries(data.getReDataSeries("ZG").slice(-30), 'ZG'),
-            cantonChartSeries(data.getReDataSeries("GR").slice(-30), 'GR'),
-            cantonChartSeries(data.getReDataSeries("CH").slice(-30), 'CH'),
+            cantonChartSeries(zh, 'ZH'),
+            cantonChartSeries(zg, 'ZG'),
+            cantonChartSeries(gr, 'GR'),
+            cantonChartSeries(ch, 'CH'),
         ],
-        chartOptionsSmall())
+        chartOptions)
 }
 
 function addFOPHDeaths(data) {
