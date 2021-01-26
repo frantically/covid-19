@@ -1,5 +1,5 @@
-import { CoronaStatistics, SERIES_HOSPITALIZED, SERIES_ICU, SERIES_VENTILATED } from './openzh.js'
 import { FOPHCoronaStatistics } from './foph.js'
+import { OWIDCoronaStatistics, VACCINATIONS_PER_HUNDRED } from './owid.js'
 import { csvStringToJson, formatDate, formatNumber } from './utils.js'
 
 var cantonConfig = {}
@@ -211,6 +211,16 @@ function addFOPHCases(data) {
         chartOptionsSmall())
 }
 
+function addVaccinations(data) {
+    var options = chartOptions('day')
+    options.scales.yAxes[0].ticks.suggestedMax = 80
+
+    addChart('vaccinations', [
+            chartSeries(data.getSeries(VACCINATIONS_PER_HUNDRED), 'CH', cantonConfig.CH.color),
+        ],
+        options)
+}
+
 function outputDebug(data) {
     console.log(data.getData('CH'))
 }
@@ -221,21 +231,19 @@ function loadCantonConfig() {
         .then(r => cantonConfig = r)
 }
 
-function initOpenZH() {
-    fetch('https://raw.githubusercontent.com/openZH/covid_19/master/COVID19_Fallzahlen_CH_total_v2.csv')
-        .then(r => r.text())
-        .then(csvData => {
-            var data = new CoronaStatistics(csvStringToJson(csvData))
-            outputDebug(data)
-            addHospital(data)
-        })
-}
-
-function loadFOPHData(url, callback) {
+function loadFOPHData(url) {
     return fetch(url)
         .then(r => r.text())
         .then(str => csvStringToJson(str))
         .then(data => new FOPHCoronaStatistics(data, cantonConfig))
+}
+
+function initOWID() {
+    fetch('https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv')
+        .then(r => r.text())
+        .then(str => csvStringToJson(str))
+        .then(data => new OWIDCoronaStatistics(data))
+        .then(data => addVaccinations(data))
 }
 
 function initFOPH() {
@@ -258,8 +266,8 @@ function initFOPH() {
 function init() {
     loadCantonConfig()
         .then(() => {
-            initOpenZH()
             initFOPH()
+            initOWID()
         })
 }
 
