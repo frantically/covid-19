@@ -1,5 +1,5 @@
 import { FOPHCoronaStatistics } from './foph.js'
-import { OWIDCoronaStatistics, PEOPLE_VACCINATED, PEOPLE_FULLY_VACCINATED } from './owid.js'
+import { OWIDCoronaStatistics, TOTAL } from './owid.js'
 import { csvStringToJson, formatDate, formatNumber } from './utils.js'
 
 var cantonConfig = {}
@@ -216,7 +216,7 @@ function addVaccinations(data) {
     options.scales.yAxes[0].ticks.suggestedMax = 80
 
     addChart('vaccinations', [
-            chartSeries(data.getSeriesPercentOfPopulation(PEOPLE_VACCINATED), 'CH First Dose', cantonConfig.CH.color),
+            chartSeries(data.getSeriesPercentOfPopulation(TOTAL), 'CH', cantonConfig.CH.color),
         ],
         options)
 }
