@@ -1,5 +1,5 @@
 import { FOPHCoronaStatistics } from './foph.js'
-import { OWIDCoronaStatistics, VACCINATIONS_PER_HUNDRED } from './owid.js'
+import { OWIDCoronaStatistics, PEOPLE_VACCINATED, PEOPLE_FULLY_VACCINATED } from './owid.js'
 import { csvStringToJson, formatDate, formatNumber } from './utils.js'
 
 var cantonConfig = {}
@@ -216,7 +216,7 @@ function addVaccinations(data) {
     options.scales.yAxes[0].ticks.suggestedMax = 80
 
     addChart('vaccinations', [
-            chartSeries(data.getSeries(VACCINATIONS_PER_HUNDRED), 'CH', cantonConfig.CH.color),
+            chartSeries(data.getSeriesPercentOfPopulation(PEOPLE_VACCINATED), 'CH First Dose', cantonConfig.CH.color),
         ],
         options)
 }
@@ -239,10 +239,10 @@ function loadFOPHData(url) {
 }
 
 function initOWID() {
-    fetch('https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv')
+    fetch('https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/country_data/Switzerland.csv')
         .then(r => r.text())
         .then(str => csvStringToJson(str))
-        .then(data => new OWIDCoronaStatistics(data))
+        .then(data => new OWIDCoronaStatistics(data, cantonConfig))
         .then(data => addVaccinations(data))
 }
 

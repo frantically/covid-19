@@ -1,13 +1,16 @@
 const COUNTRY_SWITZERLAND = "Switzerland"
-export const VACCINATIONS_PER_HUNDRED = "total_vaccinations_per_hundred"
+export const PEOPLE_VACCINATED = "people_vaccinated"
+export const PEOPLE_FULLY_VACCINATED = "people_fully_vaccinated"
 
 export class OWIDCoronaStatistics {
 
     _data = []
+    _locationConfig = {}
 
-    constructor(sourceData) {
+    constructor(sourceData, locationConfig) {
         this._data = sourceData.filter(s => s.location === COUNTRY_SWITZERLAND).map(this._converter).filter(s => s.date) //filter out last empty row in data
         console.log(this._data)
+        this._locationConfig = locationConfig
     }
 
     _converter(source) {
@@ -15,11 +18,12 @@ export class OWIDCoronaStatistics {
             key: `${source.location}_${source.date}`,
             location: 'CH',
             date: Date.parse(source.date),
-            total_vaccinations_per_hundred: parseFloat(source[VACCINATIONS_PER_HUNDRED])
+            people_vaccinated: parseFloat(source[PEOPLE_VACCINATED]),
+            people_fully_vaccinated: parseFloat(source[PEOPLE_FULLY_VACCINATED])
         }
     }
     
-    getSeries(key) {
-        return this._data.filter(s => s[key]).map(sample => {return {x: sample.date, y: sample[key]}})
+    getSeriesPercentOfPopulation(key) {
+        return this._data.filter(s => s[key]).map(sample => {return {x: sample.date, y: 100*(sample[key]/this._locationConfig.CH.population)}})
     }
 }
