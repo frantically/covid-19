@@ -90,7 +90,7 @@ function chartOptionsSmall() {
                 display: true,
                 type: 'linear',
                 ticks: {
-                    maxTicksLimit: 3
+                    maxTicksLimit: 3,
                 },
             }]
         },
@@ -202,13 +202,27 @@ function addFOPHCases(data) {
         ],
         chartOptions())
 
+
+    var zh30 = zh.slice(-30)
+    var zg30 = zg.slice(-30)
+    var gr30 = gr.slice(-30)
+    var ch30 = ch.slice(-30)
+    var all30 = [zh30, zg30, gr30, ch30].flat().map(s => s.y).filter(s => s)
+
+    var smallOptions = chartOptionsSmall()
+    
+
+    smallOptions.scales.yAxes[0].ticks.stepSize = 1
+    smallOptions.scales.yAxes[0].ticks.min = Math.floor(Math.min(...all30)/10)*10
+    smallOptions.scales.yAxes[0].ticks.max = Math.ceil(Math.max(...all30)/10)*10
+    
     addChart('chartCasesLastMonth', [
         cantonChartSeries(zh.slice(-30), 'ZH'),
         cantonChartSeries(zg.slice(-30), 'ZG'),
         cantonChartSeries(gr.slice(-30), 'GR'),
         cantonChartSeries(ch.slice(-30), 'CH'),
         ],
-        chartOptionsSmall())
+        smallOptions)
 }
 
 function addVaccinations(data) {

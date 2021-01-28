@@ -8,9 +8,7 @@ export class OWIDCoronaStatistics {
     _locationConfig = {}
 
     constructor(sourceData, locationConfig) {
-        console.log(sourceData)
         this._data = sourceData.filter(s => s.location === COUNTRY_SWITZERLAND).map(this._converter).filter(s => s.date) //filter out last empty row in data
-        console.log(this._data)
         this._locationConfig = locationConfig
     }
 
