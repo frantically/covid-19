@@ -1,6 +1,6 @@
 import { FOPHCoronaStatistics } from './foph.js'
 import { OWIDCoronaStatistics, TOTAL } from './owid.js'
-import { csvStringToJson, formatDate, formatNumber } from './utils.js'
+import { CSVToArray, formatDate, formatNumber } from './utils.js'
 
 var cantonConfig = {}
 
@@ -248,14 +248,14 @@ function loadCantonConfig() {
 function loadFOPHData(url) {
     return fetch(url)
         .then(r => r.text())
-        .then(str => csvStringToJson(str))
+        .then(str => CSVToArray(str))
         .then(data => new FOPHCoronaStatistics(data, cantonConfig))
 }
 
 function initOWID() {
     fetch('https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/country_data/Switzerland.csv')
         .then(r => r.text())
-        .then(str => csvStringToJson(str))
+        .then(str => CSVToArray(str))
         .then(data => new OWIDCoronaStatistics(data, cantonConfig))
         .then(data => addVaccinations(data))
 }

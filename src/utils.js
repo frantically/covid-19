@@ -1,14 +1,5 @@
 export const MIN_START_DATE = Date.parse("2020-03-01")
 
-export function csvStringToJson(str, delimiter = ',') {
-    const titles = str.slice(0, str.indexOf('\n')).split(delimiter).map(s => s.startsWith("\"") && s.endsWith("\"") ? s.slice(1, -1) : s)
-    const rows = str.slice(str.indexOf('\n') + 1).split('\n').map(s => s.replace(/[\x00-\x1F\x7F-\x9F]/g, ""))
-    return rows.map(row => {
-        const values = row.split(delimiter).map(s => s.startsWith("\"") && s.endsWith("\"") ? s.slice(1, -1) : s)
-        return titles.reduce((object, curr, i) => (object[curr] = values[i], object), {})
-    })
-}
-
 export function formatNumber(n) {
     return new Number(n).toLocaleString('de-CH')
 }
@@ -40,4 +31,46 @@ export function applyTheme() {
         element.classList.remove("light");
         element.classList.add("dark");
     }
+}
+
+// https://stackoverflow.com/questions/1293147/example-javascript-code-to-parse-csv-data
+export function CSVToArray( strData, strDelimiter ){
+    strDelimiter = (strDelimiter || ",");
+
+    var objPattern = new RegExp(
+        (
+            "(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
+            "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
+            "([^\"\\" + strDelimiter + "\\r\\n]*))"
+        ),
+        "gi"
+        );
+
+    var arrData = [[]];
+    var arrMatches = null;
+    while (arrMatches = objPattern.exec( strData )){
+        var strMatchedDelimiter = arrMatches[ 1 ];
+        if (
+            strMatchedDelimiter.length &&
+            strMatchedDelimiter !== strDelimiter
+            ){
+            arrData.push( [] );
+        }
+
+        var strMatchedValue;
+        if (arrMatches[ 2 ]){
+            strMatchedValue = arrMatches[ 2 ].replace(
+                new RegExp( "\"\"", "g" ),
+                "\""
+                );
+        } else {
+            strMatchedValue = arrMatches[ 3 ];
+        }
+        arrData[ arrData.length - 1 ].push( strMatchedValue );
+    }
+
+    var titles = arrData.shift()
+    return arrData.filter(r => r.length === titles.length).map(row => {
+        return titles.reduce((object, curr, i) => (object[curr] = row[i], object), {})
+    })
 }
