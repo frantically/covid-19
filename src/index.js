@@ -134,11 +134,16 @@ function addHospital(data) {
 
 function addRe(data) {
 
-
     var zh = data.getReDataSeries("ZH").slice(-30)
     var zg = data.getReDataSeries("ZG").slice(-30)
     var gr = data.getReDataSeries("GR").slice(-30)
     var ch = data.getReDataSeries("CH").slice(-30)
+    
+    var maxStartingValue = Math.max(zh[0].x, zg[0].x, gr[0].x, ch[0].x)
+    zh = zh.filter(s => s.x >= maxStartingValue)
+    zg = zg.filter(s => s.x >= maxStartingValue)
+    gr = gr.filter(s => s.x >= maxStartingValue)
+    ch = ch.filter(s => s.x >= maxStartingValue)
 
     //TODO: Is there a neater way to set a narrow yAxis range? suggestedMax/Min create a chart with a much wider range, even if the stepSize is 0.1
     var all = [zh, zg, gr, ch].flat().map(s => s.y)
