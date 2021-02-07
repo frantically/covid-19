@@ -1,10 +1,10 @@
 const fs = require('fs')
 const { FOPHCoronaStatistics } = require("../src/foph.js");
-const { csvStringToJson } = require("../src/utils.js");
+const { CSVToArray } = require("../src/utils.js");
 
 function loadTestData(file = 'test/foph.csv') {
     var csv = fs.readFileSync(file).toString()
-    return new FOPHCoronaStatistics(csvStringToJson(csv), {ZH: {population: 200000}})
+    return new FOPHCoronaStatistics(CSVToArray(csv), {ZH: {population: 200000}})
 }
 
 test("Max Date Strips Incomplete Entries at the end", () => {
