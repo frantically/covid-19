@@ -276,9 +276,9 @@ function initFOPH() {
             ])}
         )
         .then(data => {
-            addRe(data[0])
-            addFOPHDeaths(data[1])
-            addFOPHCases(data[2])
+            try { addRe(data[0]) } catch(e) {console.log(e)}
+            try { addFOPHDeaths(data[1]) } catch(e) {console.log(e)}
+                try { addFOPHCases(data[2]) } catch(e) {console.log(e)}
         })
 }
 
