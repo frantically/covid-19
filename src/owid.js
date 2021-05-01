@@ -1,6 +1,8 @@
 const COUNTRY_SWITZERLAND = "Switzerland"
 export const TOTAL = "total_vaccinations"
-// export const PEOPLE_FULLY_VACCINATED = "people_fully_vaccinated"
+export const PEOPLE_VACCINATED = "people_vaccinated"
+export const PEOPLE_FULLY_VACCINATED = "people_fully_vaccinated"
+
 
 export class OWIDCoronaStatistics {
 
@@ -18,7 +20,8 @@ export class OWIDCoronaStatistics {
             location: 'CH',
             date: Date.parse(source.date),
             total_vaccinations: parseFloat(source[TOTAL]),
-            // people_fully_vaccinated: parseFloat(source[PEOPLE_FULLY_VACCINATED])
+            people_vaccinated: parseFloat(source[PEOPLE_VACCINATED]),
+            people_fully_vaccinated: parseFloat(source[PEOPLE_FULLY_VACCINATED])
         }
     }
     

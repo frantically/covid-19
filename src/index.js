@@ -1,5 +1,5 @@
 import { FOPHCoronaStatistics } from './foph.js'
-import { OWIDCoronaStatistics, TOTAL } from './owid.js'
+import { OWIDCoronaStatistics, PEOPLE_VACCINATED, PEOPLE_FULLY_VACCINATED } from './owid.js'
 import { CSVToArray, formatDate, formatNumber } from './utils.js'
 
 var cantonConfig = {}
@@ -235,7 +235,8 @@ function addVaccinations(data) {
     options.scales.yAxes[0].ticks.suggestedMax = 80
 
     addChart('vaccinations', [
-            chartSeries(data.getSeriesPercentOfPopulation(TOTAL), 'CH', cantonConfig.CH.color),
+            chartSeries(data.getSeriesPercentOfPopulation(PEOPLE_VACCINATED), 'First Dose', [155, 155, 155]),
+            chartSeries(data.getSeriesPercentOfPopulation(PEOPLE_FULLY_VACCINATED), 'Fully Vaccinated', cantonConfig.CH.color)
         ],
         options)
 }
@@ -278,7 +279,7 @@ function initFOPH() {
         .then(data => {
             try { addRe(data[0]) } catch(e) {console.log(e)}
             try { addFOPHDeaths(data[1]) } catch(e) {console.log(e)}
-                try { addFOPHCases(data[2]) } catch(e) {console.log(e)}
+            try { addFOPHCases(data[2]) } catch(e) {console.log(e)}
         })
 }
 
